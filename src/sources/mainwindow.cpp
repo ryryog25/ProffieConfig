@@ -23,7 +23,6 @@
 MainWindow* MainWindow::instance;
 MainWindow::MainWindow() : wxFrame(NULL, wxID_ANY, "ProffieConfig", wxDefaultPosition, wxDefaultSize) {
   instance = this;
-  Configuration::instance = new Configuration();
   createMenuBar();
   createPages();
   bindEvents();

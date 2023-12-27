@@ -502,7 +502,7 @@ void Configuration::readConfig(const std::string& filePath) {
     errorMessage += e.what();
 
     // Restore App State
-    MainWindow::instance->Destroy();
+    delete MainWindow::instance;
     MainWindow::instance = new MainWindow();
 
     wxMessageBox(errorMessage, "Config Read Error", wxOK, MainWindow::instance);
@@ -518,7 +518,6 @@ void Configuration::readConfig() {
   if (stat(CONFIG_PATH, &buffer) != 0) {
     if (wxMessageBox("No existing configuration file was detected. Would you like to import one?", "ProffieConfig", wxICON_INFORMATION | wxYES_NO | wxYES_DEFAULT) == wxYES) {
       Configuration::importConfig();
-      MainWindow::instance->Show(true);
       return;
     } else return;
   }
@@ -834,7 +833,7 @@ void Configuration::readPresetArray(std::ifstream& file) {
     // Deal with Fett's comments
     comment.clear();
     if (presetInfo.find("/*") != std::string::npos) {
-      comment = presetInfo.substr(presetInfo.find("/*"), presetInfo.find("*/") + 2);
+      comment = presetInfo.substr(presetInfo.find("/*"), presetInfo.find("*/") - presetInfo.find("/*") + 2);
       presetInfo = presetInfo.substr(presetInfo.find("*/") + 2);
     }
 
@@ -847,10 +846,10 @@ void Configuration::readPresetArray(std::ifstream& file) {
         presetInfo = presetInfo.substr(presetInfo.find(11 /* length of "&style_pov,"*/));
         bladeArray.presets[preset].styles.push_back("&style_pov");
       } else {
-        element = presetInfo.substr(0, presetInfo.find("(),") + 2); // Copy in next
+        element = presetInfo.substr(presetInfo.find("Style"), presetInfo.find("()") - presetInfo.find("Style") + 2); // Copy in next
 
-        presetInfo = presetInfo.substr(presetInfo.find("(),") + 3); // Increment
-        bladeArray.presets[preset].styles.push_back(comment + element.substr(element.find("Style"), element.find("(),")));
+        presetInfo = presetInfo.substr(presetInfo.find("()") + 2); // Increment
+        bladeArray.presets[preset].styles.push_back(comment + element);
       }
     }
 
