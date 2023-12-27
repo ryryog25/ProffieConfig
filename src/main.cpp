@@ -17,8 +17,8 @@ public:
     strncpy(Misc::path, dirname(Misc::path), PATH_MAX);
     chdir(Misc::path);
 #   endif
-    wxDialog::EnableLayoutAdaptation(true);
     MainWindow::instance = new MainWindow();
+    Configuration::instance = new Configuration();
     Configuration::instance->readConfig();
     return true;
   }

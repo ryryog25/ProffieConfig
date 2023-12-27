@@ -10,15 +10,15 @@ public:
   MainWindow();
 
   static MainWindow* instance;
-  ThreadRunner* thread;
-  Progress* progDialog;
+  ThreadRunner* thread{nullptr};
+  Progress* progDialog{nullptr};
 
-  wxBoxSizer* master;
+  wxBoxSizer* master{nullptr};
 
-  wxButton* refreshButton;
-  wxButton* applyButton;
-  wxComboBox* windowSelect;
-  wxComboBox* devSelect;
+  wxButton* refreshButton{nullptr};
+  wxButton* applyButton{nullptr};
+  wxComboBox* windowSelect{nullptr};
+  wxComboBox* devSelect{nullptr};
 
 private:
   enum {
