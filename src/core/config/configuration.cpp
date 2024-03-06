@@ -135,7 +135,7 @@ void Configuration::outputConfigPresetsStyles(std::ofstream& configOutput, Edito
             std::getline(styleStream, styleLine);
             configOutput << "\t\t" << styleLine;
             if (styleStream.eof()) {
-              configOutput << ",";
+              configOutput << ",\n";
               break;
             } else configOutput << std::endl;
           }
@@ -143,7 +143,7 @@ void Configuration::outputConfigPresetsStyles(std::ofstream& configOutput, Edito
       } else configOutput << "\t\t," << std::endl;
       configOutput << "\t\t\"" << preset.name << "\"}";
       // If not the last one, add comma
-      if (&bladeArray.presets[bladeArray.presets.size() - 1] != &preset) configOutput << ",";
+      if (&bladeArray.presets[bladeArray.presets.size() - 1] != &preset) configOutput << ",\n";
       configOutput << std::endl;
     }
     configOutput << "};" << std::endl;

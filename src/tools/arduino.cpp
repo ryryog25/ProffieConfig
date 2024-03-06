@@ -112,20 +112,20 @@ void Arduino::applyToBoard(MainMenu* window, EditorWindow* editor, std::function
 
     progDialog->emitEvent(0, "Initializing...");
 
-    progDialog->emitEvent(10, "Checking board presence...");
-    wxString lastSel = window->boardSelect->entry()->GetStringSelection();
-    window->boardSelect->entry()->Clear();
-    for (const wxString& item : Arduino::getBoards()) {
-      window->boardSelect->entry()->Append(item);
-    }
-    window->boardSelect->entry()->SetValue(lastSel);
-    if (window->boardSelect->entry()->GetSelection() == -1) {
-      window->boardSelect->entry()->SetSelection(0);
-      progDialog->emitEvent(100, "Error!");
-      Misc::MessageBoxEvent* msg = new Misc::MessageBoxEvent(wxID_ANY, "Please make sure your board is connected and selected, then try again!", "Board Selection Error", wxOK | wxICON_ERROR);
-      wxQueueEvent(window->GetEventHandler(), msg);
-      return callback(false);
-    }
+    // progDialog->emitEvent(10, "Checking board presence...");
+    // wxString lastSel = window->boardSelect->entry()->GetStringSelection();
+    // window->boardSelect->entry()->Clear();
+    // for (const wxString& item : Arduino::getBoards()) {
+    //   window->boardSelect->entry()->Append(item);
+    // }
+    // window->boardSelect->entry()->SetValue(lastSel);
+    // if (window->boardSelect->entry()->GetSelection() == -1) {
+    //   window->boardSelect->entry()->SetSelection(0);
+    //   progDialog->emitEvent(100, "Error!");
+    //   Misc::MessageBoxEvent* msg = new Misc::MessageBoxEvent(wxID_ANY, "Please make sure your board is connected and selected, then try again!", "Board Selection Error", wxOK | wxICON_ERROR);
+    //   wxQueueEvent(window->GetEventHandler(), msg);
+    //   return callback(false);
+    // }
 
     progDialog->emitEvent(20, "Generating configuration file...");
     if (!Configuration::outputConfig(editor)) {
@@ -200,7 +200,7 @@ void Arduino::applyToBoard(MainMenu* window, EditorWindow* editor, std::function
     }
 
 #   else
-    if (!Arduino::upload(returnVal, editor)) {
+    if (!Arduino::upload(returnVal, editor, progDialog)) {
       progDialog->emitEvent(100, "Error");
       Misc::MessageBoxEvent* msg = new Misc::MessageBoxEvent(wxID_ANY, "There was an error while uploading:\n\n" + returnVal, "Upload Error");
       wxQueueEvent(window->GetEventHandler(), msg);
@@ -317,7 +317,7 @@ bool Arduino::compile(wxString& _return, EditorWindow* editor, Progress* progDia
 #endif
 }
 bool Arduino::upload(wxString& _return, EditorWindow* editor, Progress* progDialog) {
-  char buffer[1024];
+  unsigned char buffer;
 
   wxString uploadCommand = "upload ";
   uploadCommand += PROFFIEOS_PATH;
@@ -335,14 +335,22 @@ bool Arduino::upload(wxString& _return, EditorWindow* editor, Progress* progDial
   FILE *arduinoCli = Arduino::CLI(uploadCommand);
 
   wxString error{};
-  while(fgets(buffer, sizeof(buffer), arduinoCli) != NULL) {
-    if (progDialog != nullptr) progDialog->emitEvent(-1, ""); // Pulse
+  size_t percentPos;
+  if (progDialog != nullptr) progDialog->emitEvent(-1, "");
+  while((buffer = fgetc(arduinoCli)) != static_cast<unsigned char>(EOF)) {
+
+    if ((percentPos = error.rfind('%')) != wxString::npos) {
+      if (progDialog != nullptr) progDialog->emitEvent(std::stoi(error.ToStdString().substr(percentPos - 3, percentPos)), "");
+    }
+
+    std::cerr << buffer;
     error += buffer;
-    if (std::strstr(buffer, "error")) {
+    if (error.Contains("error") || error.Contains("FAIL")) {
       _return = Arduino::parseError(error);
       return false;
     }
   }
+
   if (pclose(arduinoCli) != 0) {
     _return = "Unknown Upload Error";
     return false;
@@ -395,7 +403,7 @@ wxString Arduino::parseError(const wxString& error) {
   if (ERRCONTAINS(/* region FLASH */"overflowed")) return "The specified config will not fit on Proffieboard.\n\nTry disabling diagnostic commands, disabling talkie, disabling prop features, or removing blade styles to make it fit.";
   if (ERRCONTAINS("Serial port busy")) return "The Proffieboard appears busy. \nPlease make sure nothing else is using it, then try again.";
   if (ERRCONTAINS("Buttons for operation")) return std::string("Selected prop file ") + std::strstr(error.data(), "requires");
-  if (ERRCONTAINS("1\n2\n3\n4\n5\n6\n7\n8\n9\n10")) return "Could not connect to Proffieboard for upload.";
+  if (ERRCONTAINS("1\n2\n3\n4\n5\n6\n7\n8\n9\n10") || ERRCONTAINS("FAIL")) return "Could not connect to Proffieboard for upload.";
   if (ERRCONTAINS("No DFU capable USB device available")) return "No Proffieboard in BOOTLOADER mode found.";
   if (ERRCONTAINS("error:")) return ERRCONTAINS("error:");
 
