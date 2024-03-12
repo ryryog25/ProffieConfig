@@ -88,8 +88,8 @@ void EditorWindow::bindEvents() {
         propsPage->updateSizeAndLayout();
         presetsPage->update();
 
-        if (bladesPage->AreAnyItemsShown()) {
-          bladesPage->Fit(bladesPage->GetContainingWindow());
+        if (bladesPage->GetSizer()->AreAnyItemsShown()) {
+          bladesPage->Fit();
           bladesPage->Layout();
         }
         if (propsPage->AreAnyItemsShown()) propsPage->Layout();

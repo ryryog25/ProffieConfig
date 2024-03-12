@@ -5,8 +5,9 @@
 
 #include <wx/spinctrl.h>
 #include <wx/stattext.h>
+#include <wx/panel.h>
 
-class pcSpinCtrl : public wxWindow {
+class pcSpinCtrl : public wxPanel {
 public:
   pcSpinCtrl(
     wxWindow* parent,

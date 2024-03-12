@@ -9,6 +9,7 @@
 #include "editor/editorwindow.h"
 
 #include <wx/textctrl.h>
+#include <wx/panel.h>
 #include <wx/stattext.h>
 #include <wx/sizer.h>
 #include <wx/wrapsizer.h>
@@ -41,121 +42,122 @@
 #define BD_ISSTRIDE (BD_ISSUB && useStride->GetValue())
 #define BD_ISZIGZAG (BD_ISSUB && useZigZag->GetValue())
 
-class BladesPage : public wxStaticBoxSizer {
+class BladesPage : public wxPanel {
 public:
-  BladesPage(wxWindow*);
+    BladesPage(wxWindow*);
 
-  void update();
+    void update();
 
-  void addBlade();
-  void addSubBlade();
-  void removeBlade();
-  void removeSubBlade();
+    void addBlade();
+    void addSubBlade();
+    void removeBlade();
+    void removeSubBlade();
 
-  int32_t lastBladeArraySelection{0};
-  
-  BladeArrayDlg* bladeArrayDlg{nullptr};
+    int32_t lastBladeArraySelection{0};
 
-  wxButton* bladeArrayButton{nullptr};
-  pcComboBox* bladeArray{nullptr};
-  wxListBox* bladeSelect{nullptr};
-  wxListBox* subBladeSelect{nullptr};
-  wxButton* addBladeButton{nullptr};
-  wxButton* removeBladeButton{nullptr};
-  wxButton* addSubBladeButton{nullptr};
-  wxButton* removeSubBladeButton{nullptr};
+    BladeArrayDlg* bladeArrayDlg{nullptr};
 
-  pcComboBox* bladeType{nullptr};
-  pcComboBox* bladeDataPin{nullptr};
-  wxStaticText* bladePixelsLabel{nullptr};
-  pcSpinCtrl* bladePixels{nullptr};
+    wxButton* bladeArrayButton{nullptr};
+    pcComboBox* bladeArray{nullptr};
+    wxListBox* bladeSelect{nullptr};
+    wxListBox* subBladeSelect{nullptr};
+    wxButton* addBladeButton{nullptr};
+    wxButton* removeBladeButton{nullptr};
+    wxButton* addSubBladeButton{nullptr};
+    wxButton* removeSubBladeButton{nullptr};
 
-  wxCheckListBox* powerPins{nullptr};
-  wxButton* addPowerPin{nullptr};
-  pcTextCtrl* powerPinName{nullptr};
+    pcComboBox* bladeType{nullptr};
+    pcComboBox* bladeDataPin{nullptr};
+    wxStaticText* bladePixelsLabel{nullptr};
+    pcSpinCtrl* bladePixels{nullptr};
 
-  pcComboBox* blade3ColorOrder{nullptr};
-  pcComboBox* blade4ColorOrder{nullptr};
-  wxCheckBox* blade4UseRGB{nullptr};
-  pcComboBox* star1Color{nullptr};
-  pcSpinCtrl* star1Resistance{nullptr};
-  pcComboBox* star2Color{nullptr};
-  pcSpinCtrl* star2Resistance{nullptr};
-  pcComboBox* star3Color{nullptr};
-  pcSpinCtrl* star3Resistance{nullptr};
-  pcComboBox* star4Color{nullptr};
-  pcSpinCtrl* star4Resistance{nullptr};
+    wxCheckListBox* powerPins{nullptr};
+    wxButton* addPowerPin{nullptr};
+    pcTextCtrl* powerPinName{nullptr};
 
-  wxRadioButton* useStandard{nullptr};
-  wxRadioButton* useStride{nullptr};
-  wxRadioButton* useZigZag{nullptr};
-  pcSpinCtrl* subBladeStart{nullptr};
-  pcSpinCtrl* subBladeEnd{nullptr};
+    pcComboBox* blade3ColorOrder{nullptr};
+    pcComboBox* blade4ColorOrder{nullptr};
+    wxCheckBox* blade4UseRGB{nullptr};
+    pcComboBox* star1Color{nullptr};
+    pcSpinCtrl* star1Resistance{nullptr};
+    pcComboBox* star2Color{nullptr};
+    pcSpinCtrl* star2Resistance{nullptr};
+    pcComboBox* star3Color{nullptr};
+    pcSpinCtrl* star3Resistance{nullptr};
+    pcComboBox* star4Color{nullptr};
+    pcSpinCtrl* star4Resistance{nullptr};
 
-  enum {
-    ID_BladeArray,
-    ID_OpenBladeArrays,
-    ID_BladeSelect,
-    ID_SubBladeSelect,
-    ID_BladeType,
-    ID_AddBlade,
-    ID_AddSubBlade,
-    ID_RemoveBlade,
-    ID_RemoveSubBlade,
+    wxRadioButton* useStandard{nullptr};
+    wxRadioButton* useStride{nullptr};
+    wxRadioButton* useZigZag{nullptr};
+    pcSpinCtrl* subBladeStart{nullptr};
+    pcSpinCtrl* subBladeEnd{nullptr};
 
-    ID_PowerPins,
-    ID_AddPowerPin,
-    ID_PowerPinName,
-  };
+    enum {
+        ID_BladeArray,
+        ID_OpenBladeArrays,
+        ID_BladeSelect,
+        ID_SubBladeSelect,
+        ID_BladeType,
+        ID_AddBlade,
+        ID_AddSubBlade,
+        ID_RemoveBlade,
+        ID_RemoveSubBlade,
 
-  struct BladeConfig {
-    wxString type{BD_PIXELRGB};
-
-    wxString dataPin{"bladePin"};
-    wxString colorType{"GRB"};
-    int32_t numPixels{0};
-    bool useRGBWithWhite{false};
-
-    wxString Star1{BD_NORESISTANCE};
-    wxString Star2{BD_NORESISTANCE};
-    wxString Star3{BD_NORESISTANCE};
-    wxString Star4{BD_NORESISTANCE};
-    int32_t Star1Resistance{0};
-    int32_t Star2Resistance{0};
-    int32_t Star3Resistance{0};
-    int32_t Star4Resistance{0};
-
-    std::vector<std::string> powerPins;
-
-    bool isSubBlade{false};
-    bool useStride{false};
-    bool useZigZag{false};
-
-    struct subBladeInfo {
-      uint32_t startPixel{0};
-      uint32_t endPixel{0};
+        ID_PowerPins,
+        ID_AddPowerPin,
+        ID_PowerPinName,
     };
-    std::vector<subBladeInfo> subBlades{};
-  };
+
+    struct BladeConfig {
+        wxString type{BD_PIXELRGB};
+
+        wxString dataPin{"bladePin"};
+        wxString colorType{"GRB"};
+        int32_t numPixels{0};
+        bool useRGBWithWhite{false};
+
+        wxString Star1{BD_NORESISTANCE};
+        wxString Star2{BD_NORESISTANCE};
+        wxString Star3{BD_NORESISTANCE};
+        wxString Star4{BD_NORESISTANCE};
+        int32_t Star1Resistance{0};
+        int32_t Star2Resistance{0};
+        int32_t Star3Resistance{0};
+        int32_t Star4Resistance{0};
+
+        std::vector<std::string> powerPins;
+
+        bool isSubBlade{false};
+        bool useStride{false};
+        bool useZigZag{false};
+
+        struct subBladeInfo {
+            uint32_t startPixel{0};
+            uint32_t endPixel{0};
+        };
+        std::vector<subBladeInfo> subBlades{};
+    };
 
 private:
-  EditorWindow* parent{nullptr};
+    EditorWindow* parent{nullptr};
+    wxStaticBoxSizer* sizer{nullptr};
 
-  void bindEvents();
-  void createToolTips();
+    void bindEvents();
+    void createToolTips();
 
-  wxBoxSizer* createBladeSelect();
-  wxBoxSizer* createBladeManager();
-  wxBoxSizer* createBladeSetup();
-  wxBoxSizer* createBladeSettings();
+    wxBoxSizer* createBladeSelect();
+    wxBoxSizer* createBladeManager();
+    wxBoxSizer* createBladeSetup();
+    wxBoxSizer* createBladeSettings();
 
-  void saveCurrent();
-  void rebuildBladeArray();
-  void loadSettings();
-  void setEnabled();
-  void setVisibility();
-  void updateRanges();
+    void saveCurrent();
+    void rebuildBladeArray();
+    void loadSettings();
+    void setEnabled();
+    void setVisibility();
+    void updateRanges();
 
-  int32_t lastBladeSelection{-1};
-  int32_t lastSubBladeSelection{-1};
+    int32_t lastBladeSelection{-1};
+    int32_t lastSubBladeSelection{-1};
 };

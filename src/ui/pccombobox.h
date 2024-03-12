@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <wx/gdicmn.h>
+#include <wx/panel.h>
 #include <wx/string.h>
 #include <wx/combobox.h>
 #include <wx/stattext.h>
 
-class pcComboBox : public wxWindow {
+class pcComboBox : public wxPanel {
 public:
   pcComboBox(
       wxWindow* parent,

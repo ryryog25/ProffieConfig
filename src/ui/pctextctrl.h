@@ -5,8 +5,9 @@
 
 #include <wx/textctrl.h>
 #include <wx/stattext.h>
+#include <wx/panel.h>
 
-class pcTextCtrl : public wxWindow {
+class pcTextCtrl : public wxPanel {
 public:
   pcTextCtrl(
     wxWindow* parent,

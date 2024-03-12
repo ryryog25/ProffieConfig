@@ -5,9 +5,10 @@
 
 #include <wx/sizer.h>
 #include <wx/tooltip.h>
+#include <wx/panel.h>
 
 pcSpinCtrlDouble::pcSpinCtrlDouble(wxWindow* _parent, int32_t _id, const wxString& _label, const wxPoint& _pos, const wxSize& _size, int32_t _style, double _min, double _max, double _initial, const wxOrientation& _orientation)
-    : wxWindow(_parent, wxID_ANY),
+    : wxPanel(_parent, wxID_ANY),
       mEntry{new wxSpinCtrlDouble(this, _id, wxEmptyString, _pos, _size, _style, _min, _max, _initial)} {
   auto sizer = new wxBoxSizer(_orientation);
   entry()->SetIncrement(0.1);

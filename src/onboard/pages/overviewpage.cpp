@@ -167,10 +167,10 @@ void Onboard::Overview::linkMainMenuEvents() {
 }
 
 void Onboard::Overview::linkEditorEvents() {
-  guideMenu->activeEditor->bladesPage->GetStaticBox()->Bind(wxEVT_UPDATE_UI, [&](wxUpdateUIEvent& event) {
+  guideMenu->activeEditor->bladesPage->Bind(wxEVT_UPDATE_UI, [&](wxUpdateUIEvent& event) {
     event.Skip();
     for (const auto& [ id, disabled ] : bladeDisables) {
-      guideMenu->activeEditor->bladesPage->GetStaticBox()->FindWindow(id)->Enable(!disabled);
+        guideMenu->activeEditor->bladesPage->FindWindow(id)->Enable(!disabled);
     }
   });
 
@@ -263,7 +263,7 @@ void Onboard::Overview::linkEditorEvents() {
       guideMenu->activeEditor->bladesPage->bladeArrayButton->Disable();
 
     }, EditorWindow::ID_WindowSelect);
-  guideMenu->activeEditor->bladesPage->GetStaticBox()->Bind(wxEVT_LISTBOX, [&](wxCommandEvent& event) {
+  guideMenu->activeEditor->bladesPage->Bind(wxEVT_LISTBOX, [&](wxCommandEvent& event) {
       EVENT_PAGE_SETUP;
 
       generateNewPage("Configuration - Blade Arrays",
@@ -287,7 +287,7 @@ void Onboard::Overview::linkEditorEvents() {
       bladeDisables.at(BladesPage::ID_AddSubBlade) = false;
 
     }, BladesPage::ID_BladeSelect);
-  guideMenu->activeEditor->bladesPage->GetStaticBox()->Bind(wxEVT_LISTBOX, [&](wxCommandEvent& event) {
+  guideMenu->activeEditor->bladesPage->Bind(wxEVT_LISTBOX, [&](wxCommandEvent& event) {
       EVENT_PAGE_SETUP;
 
       generateNewPage("Configuration - Blade Arrays",
@@ -320,7 +320,7 @@ void Onboard::Overview::linkEditorEvents() {
       guideMenu->activeEditor->bladesPage->bladeType->entry()->SetSelection(0);
 
     }, BladesPage::ID_SubBladeSelect);
-  guideMenu->activeEditor->bladesPage->GetStaticBox()->Bind(wxEVT_COMBOBOX, [&](wxCommandEvent& event) {
+  guideMenu->activeEditor->bladesPage->Bind(wxEVT_COMBOBOX, [&](wxCommandEvent& event) {
       EVENT_PAGE_SETUP;
       if (guideMenu->activeEditor->bladesPage->bladeType->entry()->GetSelection() != 2) {
         hasRun = false;
@@ -347,7 +347,7 @@ void Onboard::Overview::linkEditorEvents() {
       guideMenu->activeEditor->bladesPage->bladeType->entry()->Append("Single Color");
 
     }, BladesPage::ID_BladeType);
-  guideMenu->activeEditor->bladesPage->GetStaticBox()->Bind(wxEVT_COMBOBOX, [&](wxCommandEvent& event) {
+  guideMenu->activeEditor->bladesPage->Bind(wxEVT_COMBOBOX, [&](wxCommandEvent& event) {
       EVENT_PAGE_SETUP;
       if (guideMenu->activeEditor->bladesPage->bladeType->entry()->GetSelection() != 4) {
         hasRun = false;
@@ -372,7 +372,7 @@ void Onboard::Overview::linkEditorEvents() {
       guideMenu->activeEditor->bladesPage->bladeArrayButton->Enable();
 
     }, BladesPage::ID_BladeType);
-  guideMenu->activeEditor->bladesPage->GetStaticBox()->Bind(wxEVT_BUTTON, [&](wxCommandEvent& event) {
+  guideMenu->activeEditor->bladesPage->Bind(wxEVT_BUTTON, [&](wxCommandEvent& event) {
       EVENT_PAGE_SETUP;
 
       generateNewPage("Configuration - Blade Awareness",

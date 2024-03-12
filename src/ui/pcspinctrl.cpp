@@ -7,7 +7,7 @@
 #include <wx/tooltip.h>
 
 pcSpinCtrl::pcSpinCtrl(wxWindow* _parent, int32_t _id, const wxString& _label, const wxPoint& _pos, const wxSize& _size, int32_t _style, int32_t _min, int32_t _max, int32_t _initial, const wxOrientation& _orientation)
-    : wxWindow(_parent, wxID_ANY),
+    : wxPanel(_parent, wxID_ANY),
       mEntry{new wxSpinCtrl(this, _id, wxEmptyString, _pos, _size, _style, _min, _max, _initial)} {
   auto sizer = new wxBoxSizer(_orientation);
 

@@ -16,47 +16,48 @@
 #include <wx/combobox.h>
 #include <wx/radiobut.h>
 
-class GeneralPage : public wxStaticBoxSizer {
+class GeneralPage : public wxPanel {
 public:
-  GeneralPage(EditorWindow*);
+    GeneralPage(EditorWindow*);
 
-  pcComboBox* board{nullptr};
-  wxCheckBox* massStorage{nullptr};
-  wxCheckBox* webUSB{nullptr};
+    pcComboBox* board{nullptr};
+    wxCheckBox* massStorage{nullptr};
+    wxCheckBox* webUSB{nullptr};
 
-  CustomOptionsDlg* customOptDlg{nullptr};
-  wxButton* customOptButton{nullptr};
+    CustomOptionsDlg* customOptDlg{nullptr};
+    wxButton* customOptButton{nullptr};
 
-  pcComboBox* orientation{nullptr};
-  pcSpinCtrl* buttons{nullptr};
-  pcSpinCtrl* volume{nullptr};
-  pcSpinCtrlDouble* clash{nullptr};
-  pcSpinCtrl* pliTime{nullptr};
-  pcSpinCtrl* idleTime{nullptr};
-  pcSpinCtrl* motionTime{nullptr};
-  pcSpinCtrl* maxLEDs{nullptr};
+    pcComboBox* orientation{nullptr};
+    pcSpinCtrl* buttons{nullptr};
+    pcSpinCtrl* volume{nullptr};
+    pcSpinCtrlDouble* clash{nullptr};
+    pcSpinCtrl* pliTime{nullptr};
+    pcSpinCtrl* idleTime{nullptr};
+    pcSpinCtrl* motionTime{nullptr};
+    pcSpinCtrl* maxLEDs{nullptr};
 
-  wxCheckBox* volumeSave{nullptr};
-  wxCheckBox* presetSave{nullptr};
-  wxCheckBox* enableOLED{nullptr};
-  wxCheckBox* colorSave{nullptr};
-  wxCheckBox* disableColor{nullptr};
-  wxCheckBox* noTalkie{nullptr};
-  wxCheckBox* noBasicParsers{nullptr};
-  wxCheckBox* disableDiagnosticCommands{nullptr};
+    wxCheckBox* volumeSave{nullptr};
+    wxCheckBox* presetSave{nullptr};
+    wxCheckBox* enableOLED{nullptr};
+    wxCheckBox* colorSave{nullptr};
+    wxCheckBox* disableColor{nullptr};
+    wxCheckBox* noTalkie{nullptr};
+    wxCheckBox* noBasicParsers{nullptr};
+    wxCheckBox* disableDiagnosticCommands{nullptr};
 
-  enum {
-    ID_CustomOptions,
-  };
+    enum {
+        ID_CustomOptions,
+    };
 
 private:
-  EditorWindow* parent{nullptr};
+    EditorWindow* parent{nullptr};
+    wxStaticBoxSizer* sizer{nullptr};
 
-  void bindEvents();
-  void createToolTips();
+    void bindEvents();
+    void createToolTips();
 
-  wxStaticBoxSizer* boardSection(wxStaticBoxSizer*);
-  wxStaticBoxSizer* optionSection(wxStaticBoxSizer*);
-  wxBoxSizer* rightOptions(wxStaticBoxSizer*);
-  wxBoxSizer* leftOptions(wxStaticBoxSizer*);
+    wxStaticBoxSizer* boardSection(wxStaticBoxSizer*);
+    wxStaticBoxSizer* optionSection(wxStaticBoxSizer*);
+    wxBoxSizer* rightOptions(wxStaticBoxSizer*);
+    wxBoxSizer* leftOptions(wxStaticBoxSizer*);
 };
