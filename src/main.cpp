@@ -1,8 +1,6 @@
 // ProffieConfig, All-In-One GUI Proffieboard Configuration Utility
 // Copyright (C) 2024 Ryan Ogurek
 
-#include "core/appstate.h"
-
 #include <wx/app.h>
 
 class ProffieConfig : public wxApp {
@@ -19,8 +17,6 @@ public:
        freopen("CONIN$", "r", stdin);
     }
 #   endif
-
-    AppState::init();
 
     return true;
   }
