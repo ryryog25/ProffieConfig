@@ -30,7 +30,11 @@ LIBS += $$system(wx-config --libs all)
 
 SOURCES += \
         main.cpp \
-        pconf.cpp
+        log/logger.cpp \
+        pconf/pconf.cpp \
+        pconf/propfile.cpp
 
 HEADERS += \
-    pconf.h
+    log/logger.h \
+    pconf/pconf.h \
+    pconf/propfile.h

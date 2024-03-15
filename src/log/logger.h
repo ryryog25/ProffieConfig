@@ -1,8 +1,9 @@
+#pragma once
 /*
  * ProffieConfig, All-In-One Proffieboard Management Utility
  * Copyright (C) 2024 Ryan Ogurek
  *
- * main.cpp
+ * logger.h
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,29 +19,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <wx/app.h>
+#include <string>
 
-#include "pconf/propfile.h"
+namespace Logger {
 
-class ProffieConfig : public wxApp {
-public:
-  virtual bool OnInit() override {
+void info (const std::string& message, const bool notify = false);
+void warn (const std::string& message, const bool notify = true);
+void error(const std::string& message, const bool notify = true);
+void debug(const std::string& message, const bool notify = false);
 
-    chdir(argv[0].BeforeLast('/'));
-
-      PropFile::readProp("resources/props/fett263.pconf");
-
-#   ifdef __WXMSW__
-    MSWEnableDarkMode();
-    if (AttachConsole(ATTACH_PARENT_PROCESS)){
-       freopen("CONOUT$", "w", stdout);
-       freopen("CONOUT$", "w", stderr);
-       freopen("CONIN$", "r", stdin);
-    }
-#   endif
-
-    return true;
-  }
-};
-
-wxIMPLEMENT_APP(ProffieConfig);
+}

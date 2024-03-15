@@ -1,8 +1,9 @@
+#include "logger.h"
 /*
  * ProffieConfig, All-In-One Proffieboard Management Utility
  * Copyright (C) 2024 Ryan Ogurek
  *
- * main.cpp
+ * logger.cpp
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,29 +19,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <wx/app.h>
+#include <iostream>
 
-#include "pconf/propfile.h"
+void logMessage(const std::string& prefix, const std::string& message, const bool notify = false) {
+    std::cout << "(" << prefix << ") " << message << std::endl;
+}
 
-class ProffieConfig : public wxApp {
-public:
-  virtual bool OnInit() override {
-
-    chdir(argv[0].BeforeLast('/'));
-
-      PropFile::readProp("resources/props/fett263.pconf");
-
-#   ifdef __WXMSW__
-    MSWEnableDarkMode();
-    if (AttachConsole(ATTACH_PARENT_PROCESS)){
-       freopen("CONOUT$", "w", stdout);
-       freopen("CONOUT$", "w", stderr);
-       freopen("CONIN$", "r", stdin);
-    }
-#   endif
-
-    return true;
-  }
-};
-
-wxIMPLEMENT_APP(ProffieConfig);
+void Logger::info (const std::string& message, const bool notify) {
+    logMessage("INFO", message, notify);
+}
+void Logger::warn (const std::string& message, const bool notify) {
+    logMessage("WARN", message, notify);
+}
+void Logger::error(const std::string& message, const bool notify) {
+    logMessage("ERROR", message, notify);
+}
+void Logger::debug(const std::string& message, const bool notify) {
+    logMessage("DEBUG", message, notify);
+}
