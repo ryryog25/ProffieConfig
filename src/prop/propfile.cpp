@@ -23,7 +23,7 @@
 #include <string>
 
 #include "log/logger.h"
-#include "pconf.h"
+#include "pconf/pconf.h"
 
 static PropFile::Data::SettingMap parsePropSettings(const std::shared_ptr<PConf::Section> settingsSection);
 static PropFile::Data::LayoutVec parsePropLayout(const std::shared_ptr<PConf::Section> layoutSection, const PropFile::Data::SettingMap& settings);

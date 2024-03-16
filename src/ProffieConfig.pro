@@ -32,9 +32,9 @@ SOURCES += \
         main.cpp \
         log/logger.cpp \
         pconf/pconf.cpp \
-        pconf/propfile.cpp
+        prop/propfile.cpp
 
 HEADERS += \
     log/logger.h \
     pconf/pconf.h \
-    pconf/propfile.h
+    prop/propfile.h

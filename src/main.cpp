@@ -20,7 +20,7 @@
 
 #include <wx/app.h>
 
-#include "pconf/propfile.h"
+#include "prop/propfile.h"
 
 class ProffieConfig : public wxApp {
 public:
