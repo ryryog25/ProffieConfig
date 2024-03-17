@@ -25,19 +25,15 @@
 #include <memory>
 #include <vector>
 
+#include "config/settings.h"
+
 namespace PropFile {
 
 struct Data;
 
-std::shared_ptr<Data> readProp(const std::string& filename);
+std::vector<std::shared_ptr<Data>> getPropData(const std::vector<std::string>& pconfs);
 
 struct Data {
-    struct Setting;
-    struct Toggle;
-    struct Selection;
-    struct Numeric;
-    struct Decimal;
-
     struct LayoutItem;
     struct LayoutLevel;
 
@@ -50,21 +46,13 @@ struct Data {
 
     std::string info{};
 
-    typedef std::unordered_map<std::string, std::shared_ptr<Setting>> SettingMap;
-    SettingMap settings;
+    std::shared_ptr<Config::Define::DefineMap> settings;
 
     typedef std::vector<std::shared_ptr<LayoutItem>> LayoutVec;
-    LayoutVec layout;
+    std::shared_ptr<LayoutVec> layout;
 
-    std::unordered_map<uint8_t, std::shared_ptr<ButtonMap>> buttonControls;
-};
-
-enum class SettingType {
-    BASE,
-    TOGGLE,
-    SELECTION,
-    NUMERIC,
-    DECIMAL
+    typedef std::unordered_map<uint8_t, std::shared_ptr<ButtonMap>> Buttons;
+    std::shared_ptr<Buttons> buttonControls{std::make_shared<Buttons>()};
 };
 
 enum class LayoutType {
@@ -72,57 +60,15 @@ enum class LayoutType {
     LEVEL
 };
 
-struct Data::Setting {
-    std::string name;
-    std::string description;
-    std::string define;
-
-    std::unordered_set<std::string> require;
-    bool requireAny{false};
-
-    virtual SettingType getType() const { return SettingType::BASE; }
-};
-
-struct Data::Toggle : Setting {
-    std::unordered_set<std::string> disable;
-
-    virtual SettingType getType() const { return SettingType::TOGGLE; }
-};
-
-struct Data::Selection : Toggle {
-    bool output{true};
-    std::unordered_set<std::shared_ptr<Selection>> peers;
-
-    virtual SettingType getType() const { return SettingType::SELECTION; }
-};
-
-struct Data::Numeric : Setting {
-    int32_t min{0};
-    int32_t max{100};
-    int32_t defaultVal{min};
-    int32_t increment{1};
-
-    virtual SettingType getType() const { return SettingType::NUMERIC; }
-};
-
-struct Data::Decimal : Setting {
-    double min{0};
-    double max{0};
-    double defaultVal{min};
-    double increment{0.1};
-
-    virtual SettingType getType() const { return SettingType::DECIMAL; }
-};
-
 struct Data::LayoutItem {
-    std::shared_ptr<Setting> setting{nullptr};
+    std::shared_ptr<Config::Define::DefineBase> setting{nullptr};
 
     virtual LayoutType getType() const { return LayoutType::ITEM; }
 };
 
 struct Data::LayoutLevel : LayoutItem {
     std::string label{""};
-    std::vector<std::shared_ptr<LayoutItem>> items;
+    std::shared_ptr<std::vector<std::shared_ptr<LayoutItem>>> items;
 
     enum class Direction {
         HORIZONTAL,
@@ -144,7 +90,7 @@ struct Data::ButtonState {
 
 struct Data::Button {
     std::string label;
-    std::unordered_map<std::shared_ptr<Setting>, std::string> descriptions;
+    std::unordered_map<std::shared_ptr<Config::Define::DefineBase>, std::string> descriptions;
 };
 
 }

@@ -1,8 +1,9 @@
+#include "config.h"
 /*
  * ProffieConfig, All-In-One Proffieboard Management Utility
  * Copyright (C) 2024 Ryan Ogurek
  *
- * main.cpp
+ * config/config.cpp
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,31 +19,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <wx/app.h>
+#include "config/defaults.h"
+#include "log/logger.h"
 
-#include "config/config.h"
-#include "appcore/state.h"
+std::shared_ptr<Config::Data> Config::readConfig(const std::string& filename) {
+    auto config{Defaults::generateBlankConfig()};
 
-class ProffieConfig : public wxApp {
-public:
-    virtual bool OnInit() override {
+    return config;
+}
 
-        chdir(argv[0].BeforeLast('/'));
+void Config::writeConfig(const std::string& filename, const Data& config) {
 
-        AppCore::State::init();
-        auto config{Config::readConfig("resources/ProffieOS/config/config.h")};
-
-#   	ifdef __WXMSW__
-        MSWEnableDarkMode();
-        if (AttachConsole(ATTACH_PARENT_PROCESS)){
-            freopen("CONOUT$", "w", stdout);
-            freopen("CONOUT$", "w", stderr);
-            freopen("CONIN$", "r", stdin);
-        }
-#   	endif
-
-        return true;
-    }
-};
-
-wxIMPLEMENT_APP(ProffieConfig);
+}

@@ -1,8 +1,9 @@
+#include "state.h"
 /*
  * ProffieConfig, All-In-One Proffieboard Management Utility
  * Copyright (C) 2024 Ryan Ogurek
  *
- * main.cpp
+ * appcore/state.cpp
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,31 +19,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <wx/app.h>
+static AppCore::State* stateInstance{nullptr};
 
-#include "config/config.h"
-#include "appcore/state.h"
+AppCore::State::State() {
+    propfiles = { "fett263.pconf" };
+}
 
-class ProffieConfig : public wxApp {
-public:
-    virtual bool OnInit() override {
+void AppCore::State::init() { if (!stateInstance) stateInstance = new State(); }
 
-        chdir(argv[0].BeforeLast('/'));
-
-        AppCore::State::init();
-        auto config{Config::readConfig("resources/ProffieOS/config/config.h")};
-
-#   	ifdef __WXMSW__
-        MSWEnableDarkMode();
-        if (AttachConsole(ATTACH_PARENT_PROCESS)){
-            freopen("CONOUT$", "w", stdout);
-            freopen("CONOUT$", "w", stderr);
-            freopen("CONIN$", "r", stdin);
-        }
-#   	endif
-
-        return true;
-    }
-};
-
-wxIMPLEMENT_APP(ProffieConfig);
+const AppCore::State* AppCore::getState() { return stateInstance; }

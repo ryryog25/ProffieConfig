@@ -1,8 +1,9 @@
+#pragma once
 /*
  * ProffieConfig, All-In-One Proffieboard Management Utility
  * Copyright (C) 2024 Ryan Ogurek
  *
- * main.cpp
+ * ui/combobox.h
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,31 +19,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <wx/app.h>
+#include <wx/panel.h>
+#include <wx/stattext.h>
+#include <wx/combobox.h>
 
-#include "config/config.h"
-#include "appcore/state.h"
+namespace PCUI {
 
-class ProffieConfig : public wxApp {
+class ComboBox : wxPanel {
 public:
-    virtual bool OnInit() override {
+    ComboBox(
+        wxWindow* parent,
+        int32_t id = wxID_ANY,
+        const wxString& label = wxEmptyString,
+        const wxSize& size = wxDefaultSize,
+        const wxArrayString& choices = {},
+        int32_t style = 0,
+        const wxOrientation& orient = wxVERTICAL
+        );
 
-        chdir(argv[0].BeforeLast('/'));
+    void setToolTip(wxToolTip* tip);
 
-        AppCore::State::init();
-        auto config{Config::readConfig("resources/ProffieOS/config/config.h")};
+    const wxComboBox* entry() const;
+    const wxStaticText* text() const;
 
-#   	ifdef __WXMSW__
-        MSWEnableDarkMode();
-        if (AttachConsole(ATTACH_PARENT_PROCESS)){
-            freopen("CONOUT$", "w", stdout);
-            freopen("CONOUT$", "w", stderr);
-            freopen("CONIN$", "r", stdin);
-        }
-#   	endif
-
-        return true;
-    }
+private:
+    wxComboBox* mEntry{nullptr};
+    wxStaticText* mText{nullptr};
 };
 
-wxIMPLEMENT_APP(ProffieConfig);
+}

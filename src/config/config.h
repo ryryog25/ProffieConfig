@@ -1,8 +1,9 @@
+#pragma once
 /*
  * ProffieConfig, All-In-One Proffieboard Management Utility
  * Copyright (C) 2024 Ryan Ogurek
  *
- * main.cpp
+ * config/config.h
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,31 +19,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <wx/app.h>
+#include <string>
 
-#include "config/config.h"
-#include "appcore/state.h"
+#include "settings.h"
 
-class ProffieConfig : public wxApp {
-public:
-    virtual bool OnInit() override {
+namespace Config {
 
-        chdir(argv[0].BeforeLast('/'));
+struct Data;
+typedef std::unordered_map<std::string, std::shared_ptr<Define::DefineMap>> PropMap;
 
-        AppCore::State::init();
-        auto config{Config::readConfig("resources/ProffieOS/config/config.h")};
+std::shared_ptr<Data> readConfig(const std::string& filename);
+void writeConfig(const std::string& filename, const Data& config);
 
-#   	ifdef __WXMSW__
-        MSWEnableDarkMode();
-        if (AttachConsole(ATTACH_PARENT_PROCESS)){
-            freopen("CONOUT$", "w", stdout);
-            freopen("CONOUT$", "w", stderr);
-            freopen("CONIN$", "r", stdin);
-        }
-#   	endif
+struct Data {
+    Define::Combo proffieboard;
+    Define::Combo selectedProp;
 
-        return true;
-    }
+    Define::DefineMap generalDefines;
+    Define::CustomDefine customDefines;
+    PropMap propDefines;
+
+    int32_t maxLedsPerStrip;
 };
 
-wxIMPLEMENT_APP(ProffieConfig);
+}

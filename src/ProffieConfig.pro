@@ -11,6 +11,11 @@ win32: DEFINES += wxMessageDialog=wxGenericMessageDialog
 win32: DEFINES += wxProgressDialog=wxGenericProgressDialog
 win32: DEFINES += wxAboutBox=wxGenericAboutBox
 
+linux-g++ {
+        DEFINES += PROPPATH=\\\"resources/props/\\\"
+}
+
+
 # macOS resource handling
 ICON = ../resources/icons/icon.icns
 RESOURCE.files += ../resources/macOS/arduino-cli
@@ -29,12 +34,31 @@ RC_FILE += ./ProffieConfig_resource.rc
 LIBS += $$system(wx-config --libs all)
 
 SOURCES += \
+    appcore/state.cpp \
+    config/config.cpp \
+    config/defaults.cpp \
         main.cpp \
         log/logger.cpp \
         pconf/pconf.cpp \
-        prop/propfile.cpp
+        prop/propfile.cpp \
+        ui/combobox.cpp \
+        ui/numeric.cpp \
+        ui/numericdec.cpp \
+        ui/text.cpp \
+        ui/toggle.cpp \
+        ui/selection.cpp \
 
 HEADERS += \
+    appcore/state.h \
+    config/config.h \
+    config/defaults.h \
+    config/settings.h \
     log/logger.h \
     pconf/pconf.h \
-    prop/propfile.h
+    prop/propfile.h \
+    ui/combobox.h \
+    ui/numeric.h \
+    ui/numericdec.h \
+    ui/text.h \
+    ui/toggle.h \
+    ui/selection.h \
