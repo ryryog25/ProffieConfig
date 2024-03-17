@@ -28,17 +28,17 @@
 
 std::shared_ptr<PropFile::Data> readProp(const std::string& filename);
 
-static std::shared_ptr<Config::Define::DefineMap> parsePropSettings(const std::shared_ptr<PConf::Section> settingsSection);
-static std::shared_ptr<PropFile::Data::LayoutVec> parsePropLayout(const std::shared_ptr<PConf::Section> layoutSection, const std::shared_ptr<Config::Define::DefineMap> settings);
-static std::shared_ptr<PropFile::Data::ButtonMap> parsePropButtons(const std::shared_ptr<PConf::Section> buttonsSection, const std::shared_ptr<Config::Define::DefineMap> settings);
+static std::shared_ptr<Config::Setting::DefineMap> parsePropSettings(const std::shared_ptr<PConf::Section> settingsSection);
+static std::shared_ptr<PropFile::Data::LayoutVec> parsePropLayout(const std::shared_ptr<PConf::Section> layoutSection, const std::shared_ptr<Config::Setting::DefineMap> settings);
+static std::shared_ptr<PropFile::Data::ButtonMap> parsePropButtons(const std::shared_ptr<PConf::Section> buttonsSection, const std::shared_ptr<Config::Setting::DefineMap> settings);
 
-static void checkSettingCommon(const std::shared_ptr<PConf::Entry> entry, std::shared_ptr<Config::Define::DefineBase> setting);
-static std::shared_ptr<Config::Define::Toggle> generateToggle(const std::shared_ptr<PConf::Section> toggleSection);
-static std::vector<std::shared_ptr<Config::Define::Selection>> generateOptionSelections(const std::shared_ptr<PConf::Section> optionSection);
-static std::shared_ptr<Config::Define::Numeric> generateNumeric(const std::shared_ptr<PConf::Section> numericSection);
-static std::shared_ptr<Config::Define::Decimal> generateDecimal(const std::shared_ptr<PConf::Section> decimalSection);
+static void checkSettingCommon(const std::shared_ptr<PConf::Entry> entry, std::shared_ptr<Config::Setting::DefineBase> setting);
+static std::shared_ptr<Config::Setting::Toggle<Config::Setting::DefineBase>> generateToggle(const std::shared_ptr<PConf::Section> toggleSection);
+static std::vector<std::shared_ptr<Config::Setting::Selection<Config::Setting::DefineBase>>> generateOptionSelections(const std::shared_ptr<PConf::Section> optionSection);
+static std::shared_ptr<Config::Setting::Numeric<Config::Setting::DefineBase>> generateNumeric(const std::shared_ptr<PConf::Section> numericSection);
+static std::shared_ptr<Config::Setting::Decimal<Config::Setting::DefineBase>> generateDecimal(const std::shared_ptr<PConf::Section> decimalSection);
 
-static std::vector<std::shared_ptr<PropFile::Data::Button>> parseButtonState(const std::vector<std::shared_ptr<PConf::Entry>>& buttonEntries, std::shared_ptr<Config::Define::DefineMap> settings);
+static std::vector<std::shared_ptr<PropFile::Data::Button>> parseButtonState(const std::vector<std::shared_ptr<PConf::Entry>>& buttonEntries, std::shared_ptr<Config::Setting::DefineMap> settings);
 
 std::vector<std::shared_ptr<PropFile::Data>> PropFile::getPropData(const std::vector<std::string>& proppconfs) {
     static std::unordered_map<std::string, std::shared_ptr<PropFile::Data>> propData{};
@@ -103,8 +103,8 @@ std::shared_ptr<PropFile::Data> readProp(const std::string& filename) {
     return prop;
 };
 
-static std::shared_ptr<Config::Define::DefineMap> parsePropSettings(const std::shared_ptr<PConf::Section> settingsSection) {
-    auto settings{std::make_shared<Config::Define::DefineMap>()};
+static std::shared_ptr<Config::Setting::DefineMap> parsePropSettings(const std::shared_ptr<PConf::Section> settingsSection) {
+    auto settings{std::make_shared<Config::Setting::DefineMap>()};
 
     for (const auto& entry : settingsSection->entries) {
         if (entry->getType() != PConf::DataType::SECTION) {
@@ -130,7 +130,9 @@ static std::shared_ptr<Config::Define::DefineMap> parsePropSettings(const std::s
     }
 
     return settings;
-}  static void checkSettingCommon(const std::shared_ptr<PConf::Entry> entry, std::shared_ptr<Config::Define::DefineBase> setting) {
+}
+
+static void checkSettingCommon(const std::shared_ptr<PConf::Entry> entry, std::shared_ptr<Config::Setting::DefineBase> setting) {
     if (entry->name == "NAME") setting->name = entry->value.value_or("");
     else if (entry->name == "DESCRIPTION") setting->description = entry->value.value_or("");
     else if (entry->name == "REQUIRE" || entry->name == "REQUIREANY") {
@@ -139,13 +141,13 @@ static std::shared_ptr<Config::Define::DefineMap> parsePropSettings(const std::s
     }
 }
 
-static std::shared_ptr<Config::Define::Toggle> generateToggle(const std::shared_ptr<PConf::Section> toggleSection) {
+static std::shared_ptr<Config::Setting::Toggle<Config::Setting::DefineBase>> generateToggle(const std::shared_ptr<PConf::Section> toggleSection) {
     if (!toggleSection->label) {
         Logger::warn("Define has no define, skipping!");
         return nullptr;
     }
 
-    auto toggle{std::make_shared<Config::Define::Toggle>()};
+    auto toggle{std::make_shared<Config::Setting::Toggle<Config::Setting::DefineBase>>()};
     toggle->define = toggleSection->label.value();
     for (const auto& entry : toggleSection->entries) {
         checkSettingCommon(entry, toggle);
@@ -155,8 +157,8 @@ static std::shared_ptr<Config::Define::Toggle> generateToggle(const std::shared_
     return toggle;
 }
 
-static std::vector<std::shared_ptr<Config::Define::Selection>> generateOptionSelections(const std::shared_ptr<PConf::Section> optionSection) {
-    std::vector<std::shared_ptr<Config::Define::Selection>> selections;
+static std::vector<std::shared_ptr<Config::Setting::Selection<Config::Setting::DefineBase>>> generateOptionSelections(const std::shared_ptr<PConf::Section> optionSection) {
+    std::vector<std::shared_ptr<Config::Setting::Selection<Config::Setting::DefineBase>>> selections;
     for (const auto& entry : optionSection->entries) {
         if (entry->name == "SELECTION" && entry->getType() == PConf::DataType::SECTION) {
             if (!entry->label) {
@@ -164,7 +166,7 @@ static std::vector<std::shared_ptr<Config::Define::Selection>> generateOptionSel
                 continue;
             }
 
-            auto selection{std::make_shared<Config::Define::Selection>()};
+            auto selection{std::make_shared<Config::Setting::Selection<Config::Setting::DefineBase>>()};
             selection->define = entry->label.value();
             for (const auto& selectionEntry : std::static_pointer_cast<PConf::Section>(entry)->entries) {
                 checkSettingCommon(selectionEntry, selection);
@@ -194,13 +196,13 @@ static auto isNum = [](const std::string& str) -> bool {
 };
 
 
-static std::shared_ptr<Config::Define::Numeric> generateNumeric(const std::shared_ptr<PConf::Section> numericSection) {
+static std::shared_ptr<Config::Setting::Numeric<Config::Setting::DefineBase>> generateNumeric(const std::shared_ptr<PConf::Section> numericSection) {
     if (!numericSection->label) {
         Logger::warn("Define has no define, skipping!");
         return nullptr;
     }
 
-    auto numeric{std::make_shared<Config::Define::Numeric>()};
+    auto numeric{std::make_shared<Config::Setting::Numeric<Config::Setting::DefineBase>>()};
     numeric->define = numericSection->label.value();
     for (const auto& entry : numericSection->entries) {
         checkSettingCommon(entry, numeric);
@@ -214,13 +216,13 @@ static std::shared_ptr<Config::Define::Numeric> generateNumeric(const std::share
     return numeric;
 }
 
-static std::shared_ptr<Config::Define::Decimal> generateDecimal(const std::shared_ptr<PConf::Section> decimalSection) {
+static std::shared_ptr<Config::Setting::Decimal<Config::Setting::DefineBase>> generateDecimal(const std::shared_ptr<PConf::Section> decimalSection) {
     if (!decimalSection->label) {
         Logger::warn("Define has no define, skipping!");
         return nullptr;
     }
 
-    auto decimal{std::make_shared<Config::Define::Decimal>()};
+    auto decimal{std::make_shared<Config::Setting::Decimal<Config::Setting::DefineBase>>()};
     decimal->define = decimalSection->label.value();
     for (const auto& entry : decimalSection->entries) {
         checkSettingCommon(entry, decimal);
@@ -234,7 +236,8 @@ static std::shared_ptr<Config::Define::Decimal> generateDecimal(const std::share
     return decimal;
 }
 
-static std::shared_ptr<PropFile::Data::LayoutVec> parsePropLayout(const std::shared_ptr<PConf::Section> layoutSection, const std::shared_ptr<Config::Define::DefineMap> settings) {
+static std::shared_ptr<PropFile::Data::LayoutVec> parsePropLayout(const std::shared_ptr<PConf::Section> layoutSection, const std::shared_ptr<Config::Setting::DefineMap> settings) {
+    if (!settings) return nullptr;
     auto items{std::make_shared<PropFile::Data::LayoutVec>()};
 
     for (const auto& entry : layoutSection->entries) {
@@ -277,11 +280,13 @@ static std::shared_ptr<PropFile::Data::LayoutVec> parsePropLayout(const std::sha
     return items;
 }
 
-static std::shared_ptr<PropFile::Data::ButtonMap> parsePropButtons(const std::shared_ptr<PConf::Section> buttonsSection, const std::shared_ptr<Config::Define::DefineMap> settings) {
+static std::shared_ptr<PropFile::Data::ButtonMap> parsePropButtons(const std::shared_ptr<PConf::Section> buttonsSection, const std::shared_ptr<Config::Setting::DefineMap> settings) {
+    if (!settings) return nullptr;
     if (buttonsSection->labelNum.value_or(-1) < 0) {
         Logger::warn("Button section missing numeric label, ignoring!", false);
         return nullptr;
     }
+
 
     auto buttonMap{std::make_shared<PropFile::Data::ButtonMap>()};
     buttonMap->numButton = buttonsSection->labelNum.value();
@@ -309,7 +314,7 @@ static std::shared_ptr<PropFile::Data::ButtonMap> parsePropButtons(const std::sh
     return buttonMap;
 }
 
-static std::vector<std::shared_ptr<PropFile::Data::Button>> parseButtonState(const std::vector<std::shared_ptr<PConf::Entry>>& buttonEntries, const std::shared_ptr<Config::Define::DefineMap> settings) {
+static std::vector<std::shared_ptr<PropFile::Data::Button>> parseButtonState(const std::vector<std::shared_ptr<PConf::Entry>>& buttonEntries, const std::shared_ptr<Config::Setting::DefineMap> settings) {
     std::vector<std::shared_ptr<PropFile::Data::Button>> buttons;
     for (const auto& buttonEntry : buttonEntries) {
         if (!buttonEntry->label) {

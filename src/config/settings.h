@@ -30,19 +30,18 @@
 #include "ui/numeric.h"
 #include "ui/numericdec.h"
 
-namespace Config::Settings {
+namespace Config::Setting {
 
 struct DefineBase;
+struct SettingBase;
 template<class> struct Toggle;
 template<class> struct Selection;
 template<class> struct Numeric;
 template<class> struct Decimal;
 template<class> struct Combo;
 
-struct CustomDefine;
-
 typedef std::unordered_map<std::string, std::shared_ptr<DefineBase>> DefineMap;
-typedef std::unordered_map<std::string, std::shared_ptr<CustomDefine>> CustomDefineMap;
+typedef std::unordered_map<std::string, std::shared_ptr<SettingBase>> SettingMap;
 
 enum class SettingType {
     TOGGLE,
@@ -65,6 +64,8 @@ struct DefineBase : SettingBase {
 
     std::unordered_set<std::string> require;
     bool requireAny{false};
+
+    virtual SettingType getType() const = 0;
 };
 
 template<class Base>

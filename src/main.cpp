@@ -30,7 +30,7 @@ public:
         chdir(argv[0].BeforeLast('/'));
 
         AppCore::State::init();
-        auto config{Config::readConfig("resources/ProffieOS/config/config.h")};
+        auto config{Config::readConfig("owk_v2_config.h")};
 
 #   	ifdef __WXMSW__
         MSWEnableDarkMode();

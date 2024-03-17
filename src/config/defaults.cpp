@@ -23,10 +23,9 @@
 #include "log/logger.h"
 #include "prop/propfile.h"
 
-static void initializeProffieboard(Config::Define::Combo&);
-static void initializeSelectedProp(Config::Define::Combo&);
+static void initializeSettings(std::shared_ptr<Config::Data>);
 static void initializePropDefines(Config::PropMap&);
-static void initializeGeneralDefines(Config::Define::DefineMap&);
+static void initializeGeneralDefines(Config::Setting::DefineMap&);
 
 std::shared_ptr<Config::Data> Config::Defaults::generateBlankConfig() {
     auto appState{AppCore::getState()};
@@ -37,38 +36,38 @@ std::shared_ptr<Config::Data> Config::Defaults::generateBlankConfig() {
 
     auto config{std::make_shared<Config::Data>()};
 
-    initializeProffieboard(config->proffieboard);
-    initializeSelectedProp(config->selectedProp);
+    initializeSettings(config);
     initializePropDefines(config->propDefines);
     initializeGeneralDefines(config->generalDefines);
 
     return config;
 }
 
-static void initializeProffieboard(Config::Define::Combo& proffieboard) {
-    proffieboard.name = "Proffieboard Version";
-    proffieboard.description = "";
-    proffieboard.pureDef = true;
-
-    proffieboard.options = {
+static void initializeSettings(std::shared_ptr<Config::Data> config)  {
+    config->proffieboard.name = "Proffieboard Version";
+    config->proffieboard.description = "";
+    config->proffieboard.options = {
         { "Proffieboard V1", "#include \"proffieboard_v1_config.h\"" },
         { "Proffieboard V2", "#include \"proffieboard_v2_config.h\"" },
         { "Proffieboard V3", "#include \"proffieboard_v3_config.h\"" },
         };
+    config->proffieboard.value = "Proffieboard V3";
 
-    proffieboard.value = "Proffieboard V3";
-}
-
-static void initializeSelectedProp(Config::Define::Combo& selectedProp) {
-    selectedProp.name = "Control Profile (Prop File)";
-    selectedProp.description = "The controls and features preset (customizable depending on profile) for your saber.\n"
+    config->selectedProp.name = "Control Profile (Prop File)";
+    config->selectedProp.description = "The controls and features preset (customizable depending on profile) for your saber.\n"
                                "Also referred to as \"Prop File,\" referencing the way it's handled in the underlying ProffieOS";
-    selectedProp.pureDef = false;
-
     auto props{PropFile::getPropData(AppCore::getState()->propfiles)};
     for (const auto& prop : props) {
-        selectedProp.options.emplace(prop->name, prop->filename);
+        config->selectedProp.options.emplace(prop->name, prop->filename);
     }
+
+    config->maxLedsPerStrip.name = "WS281X Max LEDs";
+    config->maxLedsPerStrip.description = "Maximum number of LEDs in a WS281X blade per strip.\n"
+                                  "NOT blade length, that is configured on the Blades page, only increase this if you have a longer blade,"
+                                  "otherwise there's no need to change this setting.";
+    config->maxLedsPerStrip.min = 1;
+    config->maxLedsPerStrip.max = 0xFFFF;
+    config->maxLedsPerStrip.value= 144;
 }
 
 static void initializePropDefines(Config::PropMap& propDefines) {
@@ -78,13 +77,13 @@ static void initializePropDefines(Config::PropMap& propDefines) {
     }
 }
 
-static void initializeGeneralDefines(Config::Define::DefineMap& generalDefines) {
+static void initializeGeneralDefines(Config::Setting::DefineMap& generalDefines) {
 #	define DEFINE(type, ...) { \
-        auto entry{std::make_shared<type>()}; \
+        auto entry{std::make_shared<type<Config::Setting::DefineBase>>()}; \
         __VA_ARGS__ \
         generalDefines.emplace(entry->define, entry); \
     }
-    using namespace Config::Define;
+    using namespace Config::Setting;
 
     DEFINE(Combo,
            entry->name = "Orientation";
@@ -152,17 +151,7 @@ static void initializeGeneralDefines(Config::Define::DefineMap& generalDefines) 
            entry->max = 60;
            entry->value = 15;
            )
-    DEFINE(Numeric, // This'll require special treatment
-           entry->name = "WS281X Max LEDs";
-           entry->define = "const unsigned int maxLedsPerStrip =";
-           entry->description = "Maximum number of LEDs in a WS281X blade per strip.\n"
-                                "NOT blade length, that is configured on the Blades page, only increase this if you have a longer blade,"
-                                "otherwise there's no need to change this setting.";
-           entry->min = 1;
-           entry->max = 0xFFFF;
-           entry->value = 144;
-           entry->pureDef = false;
-           )
+
     DEFINE(Toggle,
            entry->name = "Save Volume";
            entry->define = "SAVE_VOLUME";
@@ -203,8 +192,6 @@ static void initializeGeneralDefines(Config::Define::DefineMap& generalDefines) 
            entry->define = "DISABLE_DIAGNOSTIC_COMMANDS";
            entry->description = "Disable Serial Monitor commands used for board diagnostics.";
            )
-
-
 
 #	undef DEFINE
 }

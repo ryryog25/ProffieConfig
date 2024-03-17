@@ -13,6 +13,7 @@ win32: DEFINES += wxAboutBox=wxGenericAboutBox
 
 linux-g++ {
         DEFINES += PROPPATH=\\\"resources/props/\\\"
+        DEFINES += CONFIGPATH=\\\"resources/ProffieOS/config/\\\"
 }
 
 

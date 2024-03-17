@@ -22,7 +22,7 @@
 static AppCore::State* stateInstance{nullptr};
 
 AppCore::State::State() {
-    propfiles = { "fett263.pconf" };
+    propfiles = { "fett263.pconf", "sa22c.pconf", "shtok.pconf", "BC.pconf", "caiwyn.pconf" };
 }
 
 void AppCore::State::init() { if (!stateInstance) stateInstance = new State(); }

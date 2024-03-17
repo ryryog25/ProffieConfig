@@ -26,20 +26,21 @@
 namespace Config {
 
 struct Data;
-typedef std::unordered_map<std::string, std::shared_ptr<Define::DefineMap>> PropMap;
+typedef std::unordered_map<std::string, std::shared_ptr<Setting::DefineMap>> PropMap;
+typedef std::unordered_map<std::string, std::string> CDefineMap;
 
 std::shared_ptr<Data> readConfig(const std::string& filename);
 void writeConfig(const std::string& filename, const Data& config);
 
 struct Data {
-    Define::Combo proffieboard;
-    Define::Combo selectedProp;
+    Setting::Combo<Setting::SettingBase> proffieboard;
+    Setting::Combo<Setting::SettingBase> selectedProp;
 
-    Define::DefineMap generalDefines;
-    Define::CustomDefine customDefines;
+    Setting::DefineMap generalDefines;
+    CDefineMap customDefines;
     PropMap propDefines;
 
-    int32_t maxLedsPerStrip;
+    Setting::Numeric<Setting::SettingBase> maxLedsPerStrip;
 };
 
 }

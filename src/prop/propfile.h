@@ -46,7 +46,7 @@ struct Data {
 
     std::string info{};
 
-    std::shared_ptr<Config::Define::DefineMap> settings;
+    std::shared_ptr<Config::Setting::DefineMap> settings;
 
     typedef std::vector<std::shared_ptr<LayoutItem>> LayoutVec;
     std::shared_ptr<LayoutVec> layout;
@@ -61,7 +61,7 @@ enum class LayoutType {
 };
 
 struct Data::LayoutItem {
-    std::shared_ptr<Config::Define::DefineBase> setting{nullptr};
+    std::shared_ptr<Config::Setting::DefineBase> setting{nullptr};
 
     virtual LayoutType getType() const { return LayoutType::ITEM; }
 };
@@ -90,7 +90,7 @@ struct Data::ButtonState {
 
 struct Data::Button {
     std::string label;
-    std::unordered_map<std::shared_ptr<Config::Define::DefineBase>, std::string> descriptions;
+    std::unordered_map<std::shared_ptr<Config::Setting::DefineBase>, std::string> descriptions;
 };
 
 }
