@@ -38,6 +38,7 @@ SOURCES += \
     appcore/state.cpp \
     config/config.cpp \
     config/defaults.cpp \
+    config/settings.cpp \
         main.cpp \
         log/logger.cpp \
         pconf/pconf.cpp \

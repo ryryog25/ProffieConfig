@@ -21,6 +21,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <map>
 #include <unordered_set>
 #include <memory>
 
@@ -40,7 +41,7 @@ template<class> struct Numeric;
 template<class> struct Decimal;
 template<class> struct Combo;
 
-typedef std::unordered_map<std::string, std::shared_ptr<DefineBase>> DefineMap;
+typedef std::map<std::string, std::shared_ptr<DefineBase>> DefineMap;
 typedef std::unordered_map<std::string, std::shared_ptr<SettingBase>> SettingMap;
 
 enum class SettingType {
@@ -60,13 +61,17 @@ struct SettingBase {
 
 struct DefineBase : SettingBase {
     std::string define;
+    std::string postfix;
     bool pureDef{true};
 
+    std::shared_ptr<DefineMap> group;
     std::unordered_set<std::string> require;
     bool requireAny{false};
 
     virtual SettingType getType() const = 0;
+    virtual bool isDisabled();
 };
+
 
 template<class Base>
 struct Toggle : Base {
@@ -124,4 +129,3 @@ struct Combo : Base {
 };
 
 }
-

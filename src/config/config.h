@@ -30,13 +30,13 @@ typedef std::unordered_map<std::string, std::shared_ptr<Setting::DefineMap>> Pro
 typedef std::unordered_map<std::string, std::string> CDefineMap;
 
 std::shared_ptr<Data> readConfig(const std::string& filename);
-void writeConfig(const std::string& filename, const Data& config);
+void writeConfig(const std::string& filename, std::shared_ptr<Data> config);
 
 struct Data {
     Setting::Combo<Setting::SettingBase> proffieboard;
     Setting::Combo<Setting::SettingBase> selectedProp;
 
-    Setting::DefineMap generalDefines;
+    std::shared_ptr<Setting::DefineMap> generalDefines;
     CDefineMap customDefines;
     PropMap propDefines;
 

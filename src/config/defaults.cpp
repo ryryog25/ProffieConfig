@@ -25,7 +25,7 @@
 
 static void initializeSettings(std::shared_ptr<Config::Data>);
 static void initializePropDefines(Config::PropMap&);
-static void initializeGeneralDefines(Config::Setting::DefineMap&);
+static void initializeGeneralDefines(std::shared_ptr<Config::Setting::DefineMap>&);
 
 std::shared_ptr<Config::Data> Config::Defaults::generateBlankConfig() {
     auto appState{AppCore::getState()};
@@ -47,11 +47,11 @@ static void initializeSettings(std::shared_ptr<Config::Data> config)  {
     config->proffieboard.name = "Proffieboard Version";
     config->proffieboard.description = "";
     config->proffieboard.options = {
-        { "Proffieboard V1", "#include \"proffieboard_v1_config.h\"" },
-        { "Proffieboard V2", "#include \"proffieboard_v2_config.h\"" },
-        { "Proffieboard V3", "#include \"proffieboard_v3_config.h\"" },
+        { "Proffieboard V1", "proffieboard_v1_config.h" },
+        { "Proffieboard V2", "proffieboard_v2_config.h" },
+        { "Proffieboard V3", "proffieboard_v3_config.h" },
         };
-    config->proffieboard.value = "Proffieboard V3";
+    config->proffieboard.value = "proffieboard_v3_config.h";
 
     config->selectedProp.name = "Control Profile (Prop File)";
     config->selectedProp.description = "The controls and features preset (customizable depending on profile) for your saber.\n"
@@ -77,13 +77,15 @@ static void initializePropDefines(Config::PropMap& propDefines) {
     }
 }
 
-static void initializeGeneralDefines(Config::Setting::DefineMap& generalDefines) {
+static void initializeGeneralDefines(std::shared_ptr<Config::Setting::DefineMap>& generalDefines) {
 #	define DEFINE(type, ...) { \
         auto entry{std::make_shared<type<Config::Setting::DefineBase>>()}; \
+        entry->group = generalDefines; \
         __VA_ARGS__ \
-        generalDefines.emplace(entry->define, entry); \
+        generalDefines->emplace(entry->define, entry); \
     }
     using namespace Config::Setting;
+    generalDefines = std::make_shared<Config::Setting::DefineMap>();
 
     DEFINE(Combo,
            entry->name = "Orientation";
@@ -97,7 +99,7 @@ static void initializeGeneralDefines(Config::Setting::DefineMap& generalDefines)
                { "Top Towards Blade", "ORIENTATION_TOP_TOWARDS_BLADE" },
                { "Bottom Towards Blade", "ORIENTATION_BOTTOM_TOWARDS_BLADE" },
                };
-           entry->value = "FETs Towards Blade";
+           entry->value = "ORIENTATION_FETS_TOWARDS_BLADE";
            )
     DEFINE(Numeric,
            entry->name = "Number of Buttons";
@@ -131,6 +133,7 @@ static void initializeGeneralDefines(Config::Setting::DefineMap& generalDefines)
            entry->name = "PLI Timeout";
            entry->define = "PLI_OFF_TIME";
            entry->description = "Time since last activity until PLI is turned off.";
+           entry->postfix = " * 60 * 1000";
            entry->min = 1;
            entry->max = 60;
            entry->value = 2;
@@ -139,6 +142,7 @@ static void initializeGeneralDefines(Config::Setting::DefineMap& generalDefines)
            entry->name = "Idle Timeout";
            entry->define = "IDLE_OFF_TIME";
            entry->description = "Time since last activity until always-on accents power off";
+           entry->postfix = " * 60 * 1000";
            entry->min = 1;
            entry->max = 60;
            entry->value = 10;
@@ -147,6 +151,7 @@ static void initializeGeneralDefines(Config::Setting::DefineMap& generalDefines)
            entry->name = "Motion Timeout";
            entry->define = "MOTION_TIMEOUT";
            entry->description = "Time since last activity until motion (Gesture Controls) is disabled.";
+           entry->postfix = " * 60 * 1000";
            entry->min = 1;
            entry->max = 60;
            entry->value = 15;

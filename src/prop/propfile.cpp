@@ -33,10 +33,11 @@ static std::shared_ptr<PropFile::Data::LayoutVec> parsePropLayout(const std::sha
 static std::shared_ptr<PropFile::Data::ButtonMap> parsePropButtons(const std::shared_ptr<PConf::Section> buttonsSection, const std::shared_ptr<Config::Setting::DefineMap> settings);
 
 static void checkSettingCommon(const std::shared_ptr<PConf::Entry> entry, std::shared_ptr<Config::Setting::DefineBase> setting);
-static std::shared_ptr<Config::Setting::Toggle<Config::Setting::DefineBase>> generateToggle(const std::shared_ptr<PConf::Section> toggleSection);
-static std::vector<std::shared_ptr<Config::Setting::Selection<Config::Setting::DefineBase>>> generateOptionSelections(const std::shared_ptr<PConf::Section> optionSection);
-static std::shared_ptr<Config::Setting::Numeric<Config::Setting::DefineBase>> generateNumeric(const std::shared_ptr<PConf::Section> numericSection);
-static std::shared_ptr<Config::Setting::Decimal<Config::Setting::DefineBase>> generateDecimal(const std::shared_ptr<PConf::Section> decimalSection);
+static void generateSettingCommon(std::shared_ptr<Config::Setting::DefineBase> setting, const std::shared_ptr<PConf::Section> section, const std::shared_ptr<Config::Setting::DefineMap> settingMap);
+static std::shared_ptr<Config::Setting::Toggle<Config::Setting::DefineBase>> generateToggle(const std::shared_ptr<PConf::Section> toggleSection, const std::shared_ptr<Config::Setting::DefineMap> settings);
+static std::vector<std::shared_ptr<Config::Setting::Selection<Config::Setting::DefineBase>>> generateOptionSelections(const std::shared_ptr<PConf::Section> optionSection, const std::shared_ptr<Config::Setting::DefineMap> settings);
+static std::shared_ptr<Config::Setting::Numeric<Config::Setting::DefineBase>> generateNumeric(const std::shared_ptr<PConf::Section> numericSection, const std::shared_ptr<Config::Setting::DefineMap> settings);
+static std::shared_ptr<Config::Setting::Decimal<Config::Setting::DefineBase>> generateDecimal(const std::shared_ptr<PConf::Section> decimalSection, const std::shared_ptr<Config::Setting::DefineMap> settings);
 
 static std::vector<std::shared_ptr<PropFile::Data::Button>> parseButtonState(const std::vector<std::shared_ptr<PConf::Entry>>& buttonEntries, std::shared_ptr<Config::Setting::DefineMap> settings);
 
@@ -114,17 +115,17 @@ static std::shared_ptr<Config::Setting::DefineMap> parsePropSettings(const std::
 
 
         if (entry->name == "TOGGLE") {
-            auto toggle{generateToggle(std::static_pointer_cast<PConf::Section>(entry))};
+            auto toggle{generateToggle(std::static_pointer_cast<PConf::Section>(entry), settings)};
             if (toggle) settings->emplace(toggle->define, toggle);
         } else if (entry->name == "OPTION") {
-            for (const auto& selection : generateOptionSelections(std::static_pointer_cast<PConf::Section>(entry))) {
+            for (const auto& selection : generateOptionSelections(std::static_pointer_cast<PConf::Section>(entry), settings)) {
                 settings->emplace(selection->define, selection);
             }
         } else if (entry->name == "NUMERIC") {
-            auto numeric{generateNumeric(std::static_pointer_cast<PConf::Section>(entry))};
+            auto numeric{generateNumeric(std::static_pointer_cast<PConf::Section>(entry), settings)};
             if (numeric) settings->emplace(numeric->define, numeric);
         } else if (entry->name == "DECIMAL") {
-            auto decimal{generateDecimal(std::static_pointer_cast<PConf::Section>(entry))};
+            auto decimal{generateDecimal(std::static_pointer_cast<PConf::Section>(entry), settings)};
             if (decimal) settings->emplace(decimal->define, decimal);
         }
     }
@@ -140,15 +141,19 @@ static void checkSettingCommon(const std::shared_ptr<PConf::Entry> entry, std::s
         setting->requireAny = entry->name == "REQUIREANY";
     }
 }
+static void generateSettingCommon(std::shared_ptr<Config::Setting::DefineBase> setting, const std::shared_ptr<PConf::Section> section, const std::shared_ptr<Config::Setting::DefineMap> settingMap) {
+    setting->define = section->label.value();
+    setting->group = settingMap;
+}
 
-static std::shared_ptr<Config::Setting::Toggle<Config::Setting::DefineBase>> generateToggle(const std::shared_ptr<PConf::Section> toggleSection) {
+static std::shared_ptr<Config::Setting::Toggle<Config::Setting::DefineBase>> generateToggle(const std::shared_ptr<PConf::Section> toggleSection, const std::shared_ptr<Config::Setting::DefineMap> settingMap) {
     if (!toggleSection->label) {
         Logger::warn("Define has no define, skipping!");
         return nullptr;
     }
 
     auto toggle{std::make_shared<Config::Setting::Toggle<Config::Setting::DefineBase>>()};
-    toggle->define = toggleSection->label.value();
+    generateSettingCommon(toggle, toggleSection, settingMap);
     for (const auto& entry : toggleSection->entries) {
         checkSettingCommon(entry, toggle);
         if (entry->name == "DISABLE") toggle->disable = PConf::setFromValue(entry->value);
@@ -157,7 +162,7 @@ static std::shared_ptr<Config::Setting::Toggle<Config::Setting::DefineBase>> gen
     return toggle;
 }
 
-static std::vector<std::shared_ptr<Config::Setting::Selection<Config::Setting::DefineBase>>> generateOptionSelections(const std::shared_ptr<PConf::Section> optionSection) {
+static std::vector<std::shared_ptr<Config::Setting::Selection<Config::Setting::DefineBase>>> generateOptionSelections(const std::shared_ptr<PConf::Section> optionSection, const std::shared_ptr<Config::Setting::DefineMap> settingMap) {
     std::vector<std::shared_ptr<Config::Setting::Selection<Config::Setting::DefineBase>>> selections;
     for (const auto& entry : optionSection->entries) {
         if (entry->name == "SELECTION" && entry->getType() == PConf::DataType::SECTION) {
@@ -167,7 +172,7 @@ static std::vector<std::shared_ptr<Config::Setting::Selection<Config::Setting::D
             }
 
             auto selection{std::make_shared<Config::Setting::Selection<Config::Setting::DefineBase>>()};
-            selection->define = entry->label.value();
+            generateSettingCommon(selection, std::static_pointer_cast<PConf::Section>(entry), settingMap);
             for (const auto& selectionEntry : std::static_pointer_cast<PConf::Section>(entry)->entries) {
                 checkSettingCommon(selectionEntry, selection);
                 if (entry->name == "DISABLE") selection->disable = PConf::setFromValue(entry->value);
@@ -196,14 +201,14 @@ static auto isNum = [](const std::string& str) -> bool {
 };
 
 
-static std::shared_ptr<Config::Setting::Numeric<Config::Setting::DefineBase>> generateNumeric(const std::shared_ptr<PConf::Section> numericSection) {
+static std::shared_ptr<Config::Setting::Numeric<Config::Setting::DefineBase>> generateNumeric(const std::shared_ptr<PConf::Section> numericSection, const std::shared_ptr<Config::Setting::DefineMap> settingMap) {
     if (!numericSection->label) {
         Logger::warn("Define has no define, skipping!");
         return nullptr;
     }
 
     auto numeric{std::make_shared<Config::Setting::Numeric<Config::Setting::DefineBase>>()};
-    numeric->define = numericSection->label.value();
+    generateSettingCommon(numeric, numericSection, settingMap);
     for (const auto& entry : numericSection->entries) {
         checkSettingCommon(entry, numeric);
         const auto& val = entry->value.value_or(" ");
@@ -216,14 +221,14 @@ static std::shared_ptr<Config::Setting::Numeric<Config::Setting::DefineBase>> ge
     return numeric;
 }
 
-static std::shared_ptr<Config::Setting::Decimal<Config::Setting::DefineBase>> generateDecimal(const std::shared_ptr<PConf::Section> decimalSection) {
+static std::shared_ptr<Config::Setting::Decimal<Config::Setting::DefineBase>> generateDecimal(const std::shared_ptr<PConf::Section> decimalSection, const std::shared_ptr<Config::Setting::DefineMap> settingMap) {
     if (!decimalSection->label) {
         Logger::warn("Define has no define, skipping!");
         return nullptr;
     }
 
     auto decimal{std::make_shared<Config::Setting::Decimal<Config::Setting::DefineBase>>()};
-    decimal->define = decimalSection->label.value();
+    generateSettingCommon(decimal, decimalSection, settingMap);
     for (const auto& entry : decimalSection->entries) {
         checkSettingCommon(entry, decimal);
         const auto& val = entry->value.value_or(" ");

@@ -30,7 +30,8 @@ public:
         chdir(argv[0].BeforeLast('/'));
 
         AppCore::State::init();
-        auto config{Config::readConfig("owk_v2_config.h")};
+        auto config{Config::readConfig("problemConfig.h")};
+        Config::writeConfig("test/problemConfig.h", config);
 
 #   	ifdef __WXMSW__
         MSWEnableDarkMode();
