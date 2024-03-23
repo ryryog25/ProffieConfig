@@ -30,6 +30,8 @@ static void pruneCustomDefines(std::shared_ptr<Config::Data>);
 static void readTop(std::istream&, std::shared_ptr<Config::Data>);
 static void readProp(std::istream&, std::shared_ptr<Config::Data>);
 
+static bool endOfSection(const std::string&, std::istream&, const std::string& sectName);
+
 static void writeMessage(std::ostream&);
 static void writeTop(std::ostream&, std::shared_ptr<Config::Data>);
 static void writeProp(std::ostream&, std::shared_ptr<Config::Data>);
@@ -112,17 +114,8 @@ static void readTop(std::istream& fileStream, std::shared_ptr<Config::Data> conf
 
     while (std::getline(fileStream, buf)) {
         buf = buf.substr(0, buf.find("//"));
-        if (buf.find("#ifdef") != std::string::npos) {
-            Logger::info("Handling unterminated CONFIG_TOP section.");
-            // Unget line
-            fileStream.unget();
-            while (fileStream.peek() != '\n') {
-                fileStream.unget();
-            }
-            fileStream.get();
-            return;
-        }
-        if (buf.find("#endif") != std::string::npos) return;
+        if (endOfSection(buf, fileStream, "CONFIG_TOP")) return;
+
         if (buf.find("maxLedsPerStrip") != std::string::npos) {
             auto numPos{buf.find_first_not_of(" \t=", buf.find('='))};
             if (!std::isdigit(buf.at(numPos))) {
@@ -207,17 +200,7 @@ static void readProp(std::istream& fileStream, std::shared_ptr<Config::Data> con
     std::string buf;
     while (std::getline(fileStream, buf)) {
         buf = buf.substr(0, buf.find("//"));
-        if (buf.find("#ifdef") != std::string::npos) {
-            Logger::info("Handling unterminated CONFIG_PROP section.");
-            // Unget line
-            fileStream.unget();
-            while (fileStream.peek() != '\n') {
-                fileStream.unget();
-            }
-            fileStream.get();
-            return;
-        }
-        if (buf.find("#endif") != std::string::npos) return;
+        if (endOfSection(buf, fileStream, "CONFIG_PROP")) return;
 
         if (buf.find("#include") == std::string::npos) continue;
 
@@ -234,6 +217,22 @@ static void readProp(std::istream& fileStream, std::shared_ptr<Config::Data> con
     }
 
     Logger::info("Hit end of config file while reading CONFIG_PROP.");
+}
+
+static bool endOfSection(const std::string& buf, std::istream& fileStream, const std::string& sectName) {
+    if (buf.find("#ifdef") != std::string::npos) {
+        Logger::info("Handling unterminated " + sectName + "section.");
+        // Unget line
+        fileStream.unget();
+        while (fileStream.peek() != '\n') {
+            fileStream.unget();
+        }
+        fileStream.get();
+        return true;
+    }
+    if (buf.find("#endif") != std::string::npos) return true;
+
+    return false;
 }
 
 static void writeMessage(std::ostream& fileStream) {

@@ -16,7 +16,6 @@ linux-g++ {
         DEFINES += CONFIGPATH=\\\"resources/ProffieOS/config/\\\"
 }
 
-
 # macOS resource handling
 ICON = ../resources/icons/icon.icns
 RESOURCE.files += ../resources/macOS/arduino-cli
@@ -35,14 +34,19 @@ RC_FILE += ./ProffieConfig_resource.rc
 LIBS += $$system(wx-config --libs all)
 
 SOURCES += \
-    appcore/state.cpp \
-    config/config.cpp \
-    config/defaults.cpp \
-    config/settings.cpp \
+        appcore/state.cpp \
+        config/config.cpp \
+        config/defaults.cpp \
+        config/settings.cpp \
         main.cpp \
         log/logger.cpp \
         pconf/pconf.cpp \
         prop/propfile.cpp \
+        styles/elements/colors.cpp \
+        styles/elements/effects.cpp \
+        styles/generator.cpp \
+        styles/style.cpp \
+        test/styleedit.cpp \
         ui/combobox.cpp \
         ui/numeric.cpp \
         ui/numericdec.cpp \
@@ -51,16 +55,24 @@ SOURCES += \
         ui/selection.cpp \
 
 HEADERS += \
-    appcore/state.h \
-    config/config.h \
-    config/defaults.h \
-    config/settings.h \
-    log/logger.h \
-    pconf/pconf.h \
-    prop/propfile.h \
-    ui/combobox.h \
-    ui/numeric.h \
-    ui/numericdec.h \
-    ui/text.h \
-    ui/toggle.h \
-    ui/selection.h \
+        appcore/state.h \
+        config/config.h \
+        config/defaults.h \
+        config/settings.h \
+        log/logger.h \
+        pconf/pconf.h \
+        prop/propfile.h \
+        styles/base.h \
+        styles/elements/colors.h \
+        styles/elements/effects.h \
+        styles/elements/functions.h \
+        styles/elements/wrappers.h \
+        styles/generator.h \
+        styles/style.h \
+        test/styleedit.h \
+        ui/combobox.h \
+        ui/numeric.h \
+        ui/numericdec.h \
+        ui/text.h \
+        ui/toggle.h \
+        ui/selection.h \

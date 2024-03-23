@@ -22,6 +22,8 @@
 
 #include "config/config.h"
 #include "appcore/state.h"
+#include "test/styleedit.h"
+#include "styles/style.h"
 
 class ProffieConfig : public wxApp {
 public:
@@ -41,6 +43,11 @@ public:
             freopen("CONIN$", "r", stdin);
         }
 #   	endif
+
+        auto style{Style::parseString("ClampF<Int<50>, 10, 100>")};
+
+        // StyleEdit::generatePage();
+
 
         return true;
     }
