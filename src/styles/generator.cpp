@@ -29,8 +29,8 @@ std::function<std::shared_ptr<Style::Base>(void)> Style::getGenerator(const std:
     { styleName::getNameStatic(), []{ return std::static_pointer_cast<Style::Base>(std::make_shared<styleName>()); } }
 
     static std::unordered_map<std::string_view, std::function<std::shared_ptr<Base>(void)>> styleMap{
-        MAPENTRY(Functions::Clamp),
-        MAPENTRY(Functions::Int)
+        MAPENTRY(Function::Clamp),
+        MAPENTRY(Function::Int)
     };
 
     auto mapIt{styleMap.find(styleStr)};

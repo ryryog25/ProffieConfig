@@ -20,6 +20,7 @@
  */
 
 #include <string>
+#include <optional>
 
 namespace Style {
 
@@ -91,11 +92,10 @@ namespace Style {
 enum class Color {
 #	define CMAP(str, name) name,
     NAMED_COLORS
-    MAX
 # 	undef CMAP
 };
 
-Color strToColor(const std::string&);
-std::string colorToStr(Color);
+std::optional<Color> strToColor(const std::string&);
+std::optional<std::string> colorToStr(Color);
 
 }

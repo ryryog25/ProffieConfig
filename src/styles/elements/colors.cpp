@@ -19,20 +19,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-Style::Color Style::strToColor(const std::string& str) {
+std::optional<Style::Color> Style::strToColor(const std::string& str) {
 #	define CMAP(colorStr, ret) if (str == colorStr) return Color::ret;
 
-    ALL_COLORS
-    return Color::MAX;
+    ALL_COLORS;
+    return std::nullopt;
 
 #	undef CMAP
 }
 
-std::string Style::colorToStr(Color color) {
+std::optional<std::string> Style::colorToStr(Color color) {
 #	define CMAP(colorStr, name) if (color == Color::name) return colorStr;
 
-    ALL_COLORS
-    return "INVALID";
+    ALL_COLORS;
+    return std::nullopt;
 
 # 	undef CMAP
 }

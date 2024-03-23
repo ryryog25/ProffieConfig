@@ -44,6 +44,7 @@ SOURCES += \
         prop/propfile.cpp \
         styles/elements/colors.cpp \
         styles/elements/effects.cpp \
+    styles/elements/lockuptype.cpp \
         styles/generator.cpp \
         styles/style.cpp \
         test/styleedit.cpp \
@@ -63,9 +64,11 @@ HEADERS += \
         pconf/pconf.h \
         prop/propfile.h \
         styles/base.h \
+    styles/elements/builtin.h \
         styles/elements/colors.h \
         styles/elements/effects.h \
         styles/elements/functions.h \
+    styles/elements/lockuptype.h \
         styles/elements/wrappers.h \
         styles/generator.h \
         styles/style.h \

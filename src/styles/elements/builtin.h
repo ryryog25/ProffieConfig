@@ -1,9 +1,9 @@
-#include "effects.h"
+#pragma once
 /*
  * ProffieConfig, All-In-One Proffieboard Management Utility
  * Copyright (C) 2024 Ryan Ogurek
  *
- * styles/elements/effects.cpp
+ * styles/elements/builtin.h
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,24 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-std::optional<Style::Effect> Style::strToEffect(const std::string& inputStr) {
-#	define EMAP(def, str) if (str == inputStr || str == "EFFECT_" + inputStr) return Effect::def;
+#include "styles/base.h"
 
-    ALL_EFFECTS;
-    return std::nullopt;
+namespace Style::Builtin {
 
-# 	undef EMAP
-}
+ELEM(Charging, "&style_charging", Type::BUILTIN)
+ELEM(POV, "&style_pov", Type::BUILTIN)
 
-std::optional<std::string> Style::effectToStr(Effect effect) {
-#	define EMAP(def, str) if (Effect::def == effect) return std::string("EFFECT_") + str;
-
-    ALL_EFFECTS;
-    return std::nullopt;
-
-#	undef EMAP
-}
-
-std::optional<std::string> Style::effectToHumanStr(Effect effect) {
-    return /* toHumanStr( */ effectToStr(effect);
 }

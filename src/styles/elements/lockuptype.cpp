@@ -1,9 +1,9 @@
-#include "effects.h"
+#include "lockuptype.h"
 /*
  * ProffieConfig, All-In-One Proffieboard Management Utility
  * Copyright (C) 2024 Ryan Ogurek
  *
- * styles/elements/effects.cpp
+ * styles/elements/lockuptype.cpp
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,24 +19,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-std::optional<Style::Effect> Style::strToEffect(const std::string& inputStr) {
-#	define EMAP(def, str) if (str == inputStr || str == "EFFECT_" + inputStr) return Effect::def;
+std::optional<Style::LockupType> Style::strToLockupType(const std::string& inputStr) {
+#	define LTMAP(def, str) if (inputStr == str || "LOCKUP_" + inputStr == str) return LockupType::def;
 
-    ALL_EFFECTS;
+    LOCKUP_TYPES;
     return std::nullopt;
 
-# 	undef EMAP
+#	undef LTMAP
 }
 
-std::optional<std::string> Style::effectToStr(Effect effect) {
-#	define EMAP(def, str) if (Effect::def == effect) return std::string("EFFECT_") + str;
+std::optional<std::string> Style::lockupTypeToStr(LockupType lockupType) {
+#	define LTMAP(def, str) if (lockupType == LockupType::def) return str;
 
-    ALL_EFFECTS;
+    LOCKUP_TYPES;
     return std::nullopt;
 
-#	undef EMAP
+#	undef LTMAP
 }
 
-std::optional<std::string> Style::effectToHumanStr(Effect effect) {
-    return /* toHumanStr( */ effectToStr(effect);
+std::optional<std::string> Style::lockupTypeToHumanStr(LockupType lockupType) {
+    return /*defToHumanStr(*/ lockupTypeToStr(lockupType);
 }

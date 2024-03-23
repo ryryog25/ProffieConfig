@@ -187,7 +187,7 @@ static bool parseArg(const std::string& argToken, Style::Arg& arg, size_t argNum
     case Type::COLOR:
         if (!argObj) {
             auto color{strToColor(argToken)};
-            if (color == Color::MAX) {
+            if (!color) {
                 Logger::error("Invalid color for argument " + std::to_string(argNum) + ": " + argToken);
                 return false;
             }
@@ -203,7 +203,7 @@ static bool parseArg(const std::string& argToken, Style::Arg& arg, size_t argNum
     case Type::EFFECT:
         if (!argObj) {
             auto effect{strToEffect(argToken)};
-            if (effect == Effect::MAX) {
+            if (!effect) {
                 Logger::error("Invalid effect for argument " + std::to_string(argNum) + ": " + argToken);
                 return false;
             }
@@ -215,6 +215,20 @@ static bool parseArg(const std::string& argToken, Style::Arg& arg, size_t argNum
         }
         arg.val = argObj;
         break;
+    case Type::LOCKUP_TYPE:
+        if (!argObj) {
+            auto lockupType{strToEffect(argToken)};
+            if (!lockupType) {
+                Logger::error("Invalid lockup type for argument " + std::to_string(argNum) + ": " + argToken);
+                return false;
+            }
+            arg.val = lockupType;
+        }
+        if (argObj->getType() != Type::LOCKUP_TYPE) {
+            mismatchError(Type::LOCKUP_TYPE);
+            return false;
+        }
+        arg.val = argObj;
     }
 
     return true;
@@ -234,7 +248,9 @@ static std::string typeToString(Style::Type type) {
         return "Color";
     case Style::Type::EFFECT:
         return "Effect";
+    case Style::Type::LOCKUP_TYPE:
+        return "LockupType";
     }
 
-    return "INVALID";
+    return "INVALID"; // ?? This will never get hit, but ok clang
 }

@@ -28,6 +28,7 @@
 
 #include "styles/elements/colors.h"
 #include "styles/elements/effects.h"
+#include "styles/elements/lockuptype.h"
 
 namespace Style {
 
@@ -40,9 +41,10 @@ enum class Type {
     RAWINT, // int
     COLOR, // If it returns a color, it can go straight into a wrapper
     EFFECT,
+    LOCKUP_TYPE,
 };
 
-typedef std::optional<std::variant<int32_t, Color, Effect, std::shared_ptr<Base>>> Value;
+typedef std::optional<std::variant<int32_t, Color, Effect, LockupType, std::shared_ptr<Base>>> Value;
 
 struct Arg {
     Arg() = delete;
