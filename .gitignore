@@ -8,3 +8,6 @@ ProffieConfig*
 !.gitignore
 
 .DS_Store
+
+StylePlayground/*
+*.backup
