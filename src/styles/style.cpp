@@ -31,7 +31,7 @@ struct TokenizedStyle {
 static std::optional<TokenizedStyle> tokenizeStyle(const std::string&);
 static bool parseArg(const std::string& argTok, Style::Arg& arg, size_t argNum);
 
-static std::string typeToString(Style::Type);
+static std::string typeToString(int32_t);
 
 std::shared_ptr<Style::Base> Style::parseString(const std::string& styleStr) {
     auto styleTokens{tokenizeStyle(styleStr)};
@@ -143,114 +143,101 @@ static bool parseArg(const std::string& argToken, Style::Arg& arg, size_t argNum
     if (argToken.find('<') != std::string::npos) argObj = Style::parseString(argToken);
     else argObj = nullptr;
 
-    auto mismatchError{[&argNum, &argObj](Style::Type expectedType) {
-        std::string errmsg;
-        errmsg += "Mismatched type at argument ";
-        errmsg += std::to_string(argNum);
-        errmsg += ". (Expected ";
-        errmsg += typeToString(expectedType);
-        errmsg += " but got ";
-        errmsg += typeToString(argObj->getType());
-        errmsg += ")";
-        Logger::error(errmsg);
-    }};
-
-    switch (arg.type) {
-    case Type::WRAPPER:
-        Logger::error("Wrapper found inside style!");
-        return false;
-    case Type::BUILTIN:
-        Logger::error("Builtin style found inside style!");
-        return false;
-    case Type::RAWINT:
-        if (argObj) {
-            Logger::error("Raw int type for argument " + std::to_string(argNum) + " cannot be a function.");
+    if (arg.type & FUNCTION) {
+        if (!argObj) return false;
+        if (argObj->getType() != arg.type) {
+            Logger::error("Mismatched function type at argument " +
+                          std::to_string(argNum) +
+                          ". (Expected " +
+                          typeToString(arg.type) +
+                          " but got " +
+                          typeToString(argObj->getType()) +
+                          ")");
             return false;
         }
+
+        arg.val = argObj;
+        return true;
+    }
+
+
+    // BUILTIN		= 0b00000000000010,
+    // INT			= 0b00000000000100,
+    // BITS		= 0b00000000001000,
+    // BOOL		= 0b00000000010000,
+    // COLOR 		= 0b00000000100000,
+    // EFFECT		= 0b00000001000000,
+    // LOCKUPTYPE	= 0b00000010000000,
+
+    switch (arg.type & FLAGMASK) {
+    case STYLETYPE:
+        Logger::error("Style found inside style!");
+        return false;
+    case BUILTIN:
+        Logger::error("Builtin style found inside style!");
+        return false;
+    case INT:
         if (!std::isdigit(argToken.at(0)) && (argToken.size() >= 2 ? !std::isdigit(argToken.at(1)) || argToken.at(0) != '-' : true)) {
-            Logger::error("Expected raw int for argument " + std::to_string(argNum) + " but didn't get a number.");
+            Logger::error("Expected int for argument " + std::to_string(argNum) + " but didn't get a number.");
             return false;
         }
         arg.val = std::stoi(argToken);
-        break;
-    case Type::INT:
-        if (!argObj) {
-            Logger::error("Int type for argument " + std::to_string(argNum) + " requires function/style base.");
+        return true;
+    case BOOL:
+        // TODO
+        return true;
+    case BITS:
+        // TODO
+        return true;
+    case COLOR: {
+        auto color{strToColor(argToken)};
+        if (!color) {
+            Logger::error("Invalid color for argument " + std::to_string(argNum) + ": " + argToken);
             return false;
         }
-        if (argObj->getType() != Type::INT) {
-            mismatchError(Type::INT);
+        arg.val = color;
+        return true; }
+    case EFFECT: {
+        auto effect{strToEffect(argToken)};
+        if (!effect) {
+            Logger::error("Invalid effect for argument " + std::to_string(argNum) + ": " + argToken);
             return false;
         }
-        arg.val = argObj;
-        break;
-    case Type::COLOR:
-        if (!argObj) {
-            auto color{strToColor(argToken)};
-            if (!color) {
-                Logger::error("Invalid color for argument " + std::to_string(argNum) + ": " + argToken);
-                return false;
-            }
-            arg.val = color;
-            break;
-        }
-        if (argObj->getType() != Type::COLOR) {
-            mismatchError(Type::COLOR);
+        arg.val = effect;
+        return true; }
+    case LOCKUPTYPE: {
+        auto lockupType{strToEffect(argToken)};
+        if (!lockupType) {
+            Logger::error("Invalid lockup type for argument " + std::to_string(argNum) + ": " + argToken);
             return false;
         }
-        arg.val = argObj;
-        break;
-    case Type::EFFECT:
-        if (!argObj) {
-            auto effect{strToEffect(argToken)};
-            if (!effect) {
-                Logger::error("Invalid effect for argument " + std::to_string(argNum) + ": " + argToken);
-                return false;
-            }
-            arg.val = effect;
-        }
-        if (argObj->getType() != Type::COLOR) {
-            mismatchError(Type::EFFECT);
-            return false;
-        }
-        arg.val = argObj;
-        break;
-    case Type::LOCKUP_TYPE:
-        if (!argObj) {
-            auto lockupType{strToEffect(argToken)};
-            if (!lockupType) {
-                Logger::error("Invalid lockup type for argument " + std::to_string(argNum) + ": " + argToken);
-                return false;
-            }
-            arg.val = lockupType;
-        }
-        if (argObj->getType() != Type::LOCKUP_TYPE) {
-            mismatchError(Type::LOCKUP_TYPE);
-            return false;
-        }
-        arg.val = argObj;
+        arg.val = lockupType;
+        return true; }
     }
 
-    return true;
+    Logger::error("Unknown argument type found for argument " + std::to_string(argNum) + ": " + argToken);
+    return false;
 }
 
-static std::string typeToString(Style::Type type) {
+static std::string typeToString(int32_t type) {
     switch (type) {
-    case Style::Type::WRAPPER:
+    case Style::STYLETYPE:
         return "Wrapper";
-    case Style::Type::BUILTIN:
+    case Style::BUILTIN:
         return "BuiltIn";
-    case Style::Type::INT:
+    case Style::INT:
         return "Int";
-    case Style::Type::RAWINT:
-        return "Raw Int";
-    case Style::Type::COLOR:
+    case Style::BITS:
+        return "Bits";
+    case Style::BOOL:
+        return "Boolean";
+    case Style::COLOR:
         return "Color";
-    case Style::Type::EFFECT:
+    case Style::EFFECT:
         return "Effect";
-    case Style::Type::LOCKUP_TYPE:
+    case Style::LOCKUPTYPE:
         return "LockupType";
     }
 
-    return "INVALID"; // ?? This will never get hit, but ok clang
+    return "INVALID";
 }

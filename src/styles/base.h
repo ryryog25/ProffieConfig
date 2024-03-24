@@ -37,7 +37,7 @@ struct Base;
 enum {
     FUNCTION 	= 0b10000000000000,
     VARIADIC	= 0b01000000000000,
-    STYLE		= 0b00000000000001,
+    STYLETYPE	= 0b00000000000001,
     BUILTIN		= 0b00000000000010,
     INT			= 0b00000000000100,
     BITS		= 0b00000000001000,
@@ -45,6 +45,8 @@ enum {
     COLOR 		= 0b00000000100000,
     EFFECT		= 0b00000001000000,
     LOCKUPTYPE	= 0b00000010000000,
+
+    FLAGMASK	= (FUNCTION | VARIADIC) ^ 0xFFFF,
     // OFFTYPE?
     // CHANGETYPE?
     // CCTYPE?
@@ -74,14 +76,50 @@ struct Base {
 
 #define ELEM(name, humanName, retType, ...) \
 struct name : Base { \
-    name(const std::vector<Arg>& argVec) : args(argVec) {} \
+    name() {} \
+    name(const std::vector<Value>& valVec) { \
+        Arg* arg; \
+        for (size_t i = 0; i < valVec.size(); i++) { \
+            if (i >= args.size()) { \
+                arg = &args.at(args.size() - 1); \
+                if (!(arg->type & VARIADIC)) break; \
+            } else arg = &args.at(i); \
+            const auto& value{valVec.at(i)}; \
+            if (!value) continue; \
+            if (arg->type & FUNCTION) { \
+                if (!std::holds_alternative<std::shared_ptr<Base>>(value.value())) /* error */ continue; \
+                if (std::get<std::shared_ptr<Base>>(value.value())->getType() != arg->type) /* error */ continue; \
+                arg->val = value.value(); \
+                continue; \
+            } \
+            switch (arg->type & FLAGMASK) { \
+            case INT: \
+            case BITS: \
+            case BOOL: \
+                if (!std::holds_alternative<int32_t>(value.value())) /* error */ continue; \
+                break; \
+            case COLOR: \
+                if (!std::holds_alternative<Color>(value.value())) /* error */ continue; \
+                break; \
+            case EFFECT: \
+                if (!std::holds_alternative<Effect>(value.value())) /* error */ continue; \
+                break; \
+            case LOCKUPTYPE: \
+                if (!std::holds_alternative<LockupType>(value.value())) /* error */ continue; \
+                break; \
+            default: \
+                /* error */ continue; \
+            } \
+            arg->val = value.value(); \
+        } \
+    } \
     static const std::string_view getNameStatic() { return #name; } \
     virtual const std::string_view getHumanName() const { return humanName; } \
     virtual int32_t getType() const { return retType; } \
     virtual const std::vector<Arg>& getArgs() const { return args; } \
 private: \
     virtual const std::string_view getName() const { return getNameStatic(); } \
-    const std::vector<Arg> args{ \
+    std::vector<Arg> args{ \
         __VA_ARGS__ \
     }; \
 };

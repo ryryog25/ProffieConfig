@@ -35,7 +35,7 @@
 namespace Style::Function {
 
 #define FUNC(name, humanName, ...) ELEM(name, humanName, INT | FUNCTION, __VA_ARGS__)
-#define INT(num) std::make_shared<Int>(std::vector<Arg>{num})
+#define INT(num) std::make_shared<Int>(std::vector<Value>{num})
 
 // Usage: Int<N>
 // Returns N
@@ -665,5 +665,8 @@ FUNC(PulsingF, "Pulsing",
 
 // Left off at slice.h
 
+
+#undef FUNC
+#undef INT
 }
 

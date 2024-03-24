@@ -28,13 +28,15 @@ std::function<std::shared_ptr<Style::Base>(void)> Style::getGenerator(const std:
 #   define MAPENTRY(styleName) \
     { styleName::getNameStatic(), []{ return std::static_pointer_cast<Style::Base>(std::make_shared<styleName>()); } }
 
-    static std::unordered_map<std::string_view, std::function<std::shared_ptr<Base>(void)>> styleMap{
-        MAPENTRY(Function::Clamp),
-        MAPENTRY(Function::Int)
-    };
+    static std::unordered_map<std::string_view,std::function<std::shared_ptr<Base>(void)>> styleMap{
+                 {Function ::ClampF ::getNameStatic(), [] { return std ::static_pointer_cast<Style ::Base>(
+                          std ::make_shared<Function ::ClampF>());
+                  }},
+                 MAPENTRY(Function::Int)};
 
     auto mapIt{styleMap.find(styleStr)};
-    if (mapIt == styleMap.end()) return nullptr;
+    if (mapIt == styleMap.end())
+        return nullptr;
     return mapIt->second;
 #   undef MAPENTRY
 }
