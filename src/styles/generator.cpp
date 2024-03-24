@@ -23,16 +23,80 @@
 #include <memory>
 
 #include "styles/elements/functions.h"
+#include "styles/elements/styletypes.h"
 
 std::function<std::shared_ptr<Style::Base>(void)> Style::getGenerator(const std::string_view& styleStr) {
 #   define MAPENTRY(styleName) \
     { styleName::getNameStatic(), []{ return std::static_pointer_cast<Style::Base>(std::make_shared<styleName>()); } }
 
     static std::unordered_map<std::string_view,std::function<std::shared_ptr<Base>(void)>> styleMap{
-                 {Function ::ClampF ::getNameStatic(), [] { return std ::static_pointer_cast<Style ::Base>(
-                          std ::make_shared<Function ::ClampF>());
-                  }},
-                 MAPENTRY(Function::Int)};
+        MAPENTRY(Wrapper::StylePtr),
+        MAPENTRY(Wrapper::ChargingStylePtr),
+        MAPENTRY(Wrapper::NormalPtr),
+        MAPENTRY(Wrapper::NormalPtrX),
+        MAPENTRY(Wrapper::RainbowPtr),
+        MAPENTRY(Wrapper::RainbowPtrX),
+        MAPENTRY(Wrapper::StrobePtr),
+        MAPENTRY(Function::Int),
+        MAPENTRY(Function::AltF),
+        MAPENTRY(Function::SyncAltToVarianceF),
+        MAPENTRY(Function::SyncAltToVarianceL),
+        MAPENTRY(Function::BatteryLevel),
+        MAPENTRY(Function::BladeAngle),
+        MAPENTRY(Function::BladeAngleX),
+        MAPENTRY(Function::BlastF),
+        MAPENTRY(Function::BlastFadeoutF),
+        MAPENTRY(Function::OriginalBlastF),
+        MAPENTRY(Function::Blinking),
+        MAPENTRY(Function::BrownNoiseF),
+        MAPENTRY(Function::SlowNoise),
+        MAPENTRY(Function::Bump),
+        MAPENTRY(Function::HumpFlickerF),
+        MAPENTRY(Function::HumpFlickerFX),
+        MAPENTRY(Function::CenterDistF),
+        MAPENTRY(Function::ChangeSlowly),
+        MAPENTRY(Function::CircularSectionF),
+        MAPENTRY(Function::ClampF),
+        MAPENTRY(Function::ClampFX),
+        MAPENTRY(Function::ClashImpactF),
+        MAPENTRY(Function::ClashImpactFX),
+        MAPENTRY(Function::Divide),
+        MAPENTRY(Function::EffectPulse),
+        MAPENTRY(Function::LockupPulseF),
+        MAPENTRY(Function::IncrementWithReset),
+        MAPENTRY(Function::EffectIncrementF),
+        MAPENTRY(Function::EffectPosition),
+        MAPENTRY(Function::HoldPeakF),
+        MAPENTRY(Function::Ifon),
+        MAPENTRY(Function::InOutFunc),
+        MAPENTRY(Function::InOutFuncX),
+        MAPENTRY(Function::InOutFuncTD),
+        MAPENTRY(Function::InOutHelperF),
+        MAPENTRY(Function::IncrementModuloF),
+        MAPENTRY(Function::ThresholdPulseF),
+        MAPENTRY(Function::IncrementF),
+        MAPENTRY(Function::IntArg),
+        MAPENTRY(Function::IntSelect),
+        MAPENTRY(Function::IsBetween),
+        MAPENTRY(Function::IsLessThan),
+        MAPENTRY(Function::IsGreaterThan),
+        MAPENTRY(Function::LinearSectionF),
+        MAPENTRY(Function::MarbleF),
+        MAPENTRY(Function::ModF),
+        MAPENTRY(Function::Mult),
+        MAPENTRY(Function::Percentage),
+        MAPENTRY(Function::OnSparkF),
+        MAPENTRY(Function::RampF),
+        MAPENTRY(Function::RandomF),
+        MAPENTRY(Function::RandomPerLEDF),
+        MAPENTRY(Function::RandomBlinkF),
+        MAPENTRY(Function::Scale),
+        MAPENTRY(Function::InvertF),
+        MAPENTRY(Function::SequenceF),
+        MAPENTRY(Function::Sin),
+        MAPENTRY(Function::Saw),
+        MAPENTRY(Function::PulsingF),
+    };
 
     auto mapIt{styleMap.find(styleStr)};
     if (mapIt == styleMap.end())

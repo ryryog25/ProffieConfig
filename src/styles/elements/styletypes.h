@@ -27,17 +27,9 @@ namespace Style::Wrapper {
 
 // NEED A BETTER HUMAN NAME for all these tbh
 
-struct StylePtr : Base {
-
-    static const std ::string_view getNameStatic() { return "StylePtr"; }
-    virtual const std ::string_view getHumanName() const { return "StylePtr"; }
-    virtual int32_t getType() const { return STYLETYPE; }
-    virtual const std ::vector<Arg> &getArgs() const { return args; }
-
-private:
-    virtual const std ::string_view getName() const { return getNameStatic(); }
-    std ::vector<Arg> args{Arg("Style Contents", COLOR)};
-};
+STYLETYPE(StylePtr, "StylePtr",
+          Arg("Style Contents", COLOR)
+          )
 
 STYLETYPE(ChargingStylePtr, "ChargingStylePtr",
           Arg("Style Contents", COLOR)
