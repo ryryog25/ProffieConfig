@@ -34,26 +34,39 @@
 
 namespace Style::Function {
 
+#define FUNC(name, humanName, ...) ELEM(name, humanName, INT | FUNCTION, __VA_ARGS__)
+#define INT(num) std::make_shared<Int>(std::vector<Arg>{num})
+
+// Usage: Int<N>
+// Returns N
+// N: a number
+// return value: INTEGER
+//
+// This needs to be first since it's used by everything else
+FUNC(Int, "Number",
+     Arg("Number", INT)
+     )
+
 // Usage: AltF
 // return value: INTEGER
 // Returns current_alternative for use in ColorSelect<>, TrSelect<> or IntSelect<>
-ELEM(Alt, "AltF", Type::INT)
+FUNC(AltF, "Alternative")
 
 // Usage: SyncAltToVarianceF
 // return value: INTEGER (always zero)
 // Enables Bidirectional synchronization between ALT and VARIANCE.
 // If variance changes, so does alt, if alt changes, so does variance.
-ELEM(SyncAltToVariance, "SyncAltToVarianceF", Type::INT)
+FUNC(SyncAltToVarianceF, "Sync Alternative and Variance")
 
 // Usage: SyncAltToVarianceL
 // return value: LAYER (transparent)
 // Synchronizes alt to variance, just put it somewhere in the layer stack. (but not first)
-ELEM(SyncAltToVarianceL, "SyncAltToVarianceL", Type::COLOR)
+ELEM(SyncAltToVarianceL, "Sync Alternative and Variance", COLOR)
 
 // Usage: BatteryLevel
 // Returns 0-32768 based on battery level.
 // returned value: INTEGER
-ELEM(BatteryLevel, "BatteryLevel", Type::INT)
+FUNC(BatteryLevel, "Battery Level")
 
 
 // Usage: BladeAngleX<MIN, MAX>
@@ -67,14 +80,14 @@ ELEM(BatteryLevel, "BatteryLevel", Type::INT)
 // point the blade towards the horizon and 32768 when you point it
 // straight up. Any angle below the horizon will also return zero.
 // returned value: FUNCTION, same for all leds
-ELEM(BladeAngle, "BladeAngle", Type::INT,
-     Arg("Min", Type::RAWINT, 0),
-     Arg("Max", Type::RAWINT, 32768)
+FUNC(BladeAngle, "Blade Angle",
+     Arg("Min", INT, 0),
+     Arg("Max", INT, 32768)
      )
 
-ELEM(BladeAngleX, "BladeAngleX", Type::INT,
-     Arg("Min", Type::INT, 0),
-     Arg("Max", Type::INT, 32768)
+FUNC(BladeAngleX, "Blade Angle",
+     Arg("Min", INT | FUNCTION, INT(0)),
+     Arg("Max", INT | FUNCTION, INT(32768))
      )
 
 // Usage: BlastF<FADEOUT_MS, WAVE_SIZE, WAVE_MS, EFFECT>
@@ -93,11 +106,11 @@ ELEM(BladeAngleX, "BladeAngleX", Type::INT,
 // The WAVE_MS parameter controls the speed of the waves.
 // EFFECT can be used to trigger this effect by something
 // other than a blast effect.
-ELEM(Blast, "BlastF", Type::INT,
-     Arg("Fadeout (ms)", Type::RAWINT, 200),
-     Arg("Wave Size", Type::RAWINT, 100),
-     Arg("Wave Time (ms)", Type::RAWINT, 400),
-     Arg("Effect", Type::EFFECT, Effect::BLAST)
+FUNC(BlastF, "Blast",
+     Arg("Fadeout (ms)", 	INT, 200),
+     Arg("Wave Size", 		INT, 100),
+     Arg("Wave Time (ms)",	INT, 400),
+     Arg("Trigger Effect", EFFECT, Effect::BLAST)
      )
 
 // Usage: BlastFadeoutF<FADEOUT_MS, EFFECT>
@@ -107,9 +120,9 @@ ELEM(Blast, "BlastF", Type::INT,
 // NOrmally returns 0, but returns up to 32768 when the
 // selected effect occurs. Then if fades back to zero over
 // FADEOUT_MS milliseconds.
-ELEM(BlastFadeout, "BlastFadeoutF", Type::INT,
-     Arg("Fadeout (ms)", Type::RAWINT, 250),
-     Arg("Effect", Type::EFFECT, Effect::BLAST)
+FUNC(BlastFadeoutF, "Blast Fadeout",
+     Arg("Fade Time (ms)", INT, 250),
+     Arg("Trigger Effect", EFFECT, Effect::BLAST)
      )
 
 // Usage: OriginalBlastF<EFFECT>
@@ -117,8 +130,8 @@ ELEM(BlastFadeout, "BlastFadeoutF", Type::INT,
 // return value: FUNCTION
 // Original blast function. Normally returns zero, but
 // returns up to 32768 when the selected effect occurs.
-ELEM(OriginalBlast, "OriginalBlastF", Type::INT,
-     Arg("Effect", Type::EFFECT, Effect::BLAST)
+FUNC(OriginalBlastF, "Original Blast",
+     Arg("Trigger Effect", EFFECT, Effect::BLAST)
      )
 
 // Usage: BlinkingF<A, B, BLINK_MILLIS_FUNC, BLINK_PROMILLE_FUNC>
@@ -133,17 +146,17 @@ ELEM(OriginalBlast, "OriginalBlastF", Type::INT,
 // second half. If BLINK_PROMILLE is smaller, we get less A and more B.
 // If BLINK_PROMILLE is 0, we get all 0.
 // If BLINK_PROMILLE is 1000 we get all 32768.
-ELEM(Blinking, "BlinkingF", Type::INT,
-     Arg("Time (ms)", Type::INT),
-     Arg("Distribution", Type::INT)
+FUNC(Blinking, "BlinkingF",
+     Arg("Time (ms)", INT),
+     Arg("Distribution", INT)
      )
 
 // Usage: BrownNoiseF<GRADE>
 // return value: FUNCTION
 // Returns a value between 0 and 32768 with nearby pixels being similar.
 // GRADE controls how similar nearby pixels are.
-ELEM(BrownNoise, "BrownNoiseF", Type::INT,
-     Arg("Grade", Type::INT)
+FUNC(BrownNoiseF, "Brown Noise",
+     Arg("Grade", INT | FUNCTION)
      )
 
 // Usage: SlowNoise<SPEED>
@@ -151,8 +164,8 @@ ELEM(BrownNoise, "BrownNoiseF", Type::INT,
 // Returns a value between 0 and 32768 which changes randomly up and
 // down over time. All pixels gets the same value.
 // SPEED controls how quickly the value changes.
-ELEM(SlowNoise, "SlowNoise", Type::INT,
-     Arg("Speed", Type::INT)
+FUNC(SlowNoise, "Slow Noise",
+     Arg("Speed", INT | FUNCTION)
      )
 
 // Usage: Bump<BUMP_POSITION, BUMP_WIDTH_FRACTION>
@@ -162,9 +175,9 @@ ELEM(SlowNoise, "SlowNoise", Type::INT,
 // If BUMP_WIDTH_FRACTION is 1, bump will be extremely narrow.
 // If BUMP_WIDTH_FRACTION is 32768, it will fill up most/all of the blade.
 // BUMP_POSITION, BUMP_WIDTH_FRACTION: INTEGER
-ELEM(Bump, "Bump", Type::INT,
-     Arg("Position", Type::INT),
-     Arg("Width", Type::INT, 16385)
+FUNC(Bump, "Bump",
+     Arg("Position", INT | FUNCTION),
+     Arg("Width", INT | FUNCTION, INT(16385))
      )
 
 // Usage: HumpFlickerFX<FUNCTION>
@@ -176,28 +189,30 @@ ELEM(Bump, "Bump", Type::INT,
 // The returned INTEGER is the size of the humps.
 // Large values can give the blade a shimmering look,
 // while small values look more like speckles.
-ELEM(HumpFlicker, "HumpFlickerF", Type::INT,
-     Arg("Hump Width", Type::RAWINT)
+FUNC(HumpFlickerF, "Hump Flicker",
+     Arg("Hump Width", INT)
      )
 
-ELEM(HumpFlickerX, "HumpFlickerFX", Type::INT,
-     Arg("Hump Width", Type::INT)
+FUNC(HumpFlickerFX, "Hump Flicker",
+     Arg("Hump Width", INT | FUNCTION)
      )
 
 // Usage: Remap<CenterDistF<CENTER>,COLOR>
 // Distributes led COLOR from CENTER
 // CENTER : FUNCTION (defaults to Int<16384>)
-ELEM(CenterDist, "CenterDistF", Type::INT,
-     Arg("Center", Type::INT, 16384)
+//
+//
+FUNC(CenterDistF, "Center Distribution",
+     Arg("Center", INT | FUNCTION, INT(16384))
      )
 
 // Usage: ChangeSlowly<F, SPEED>
 // Changes F by no more than SPEED values per second.
 // F, SPEED: FUNCTION
 // return value: FUNCTION, same for all LEDs
-ELEM(ChangeSlowly, "ChangeSlowly", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Speed", Type::INT)
+FUNC(ChangeSlowly, "Change Slowly",
+     Arg("Input", INT | FUNCTION),
+     Arg("Speed", INT | FUNCTION)
      )
 
 // Usage: CircularSectionF<POSITION, FRACTION>
@@ -210,9 +225,9 @@ ELEM(ChangeSlowly, "ChangeSlowly", Type::INT,
 // Example: If POSITION = 0 and FRACTION = 16384, then this function
 // will return 32768 for the first 25% and the last 25% of the blade
 // and 0 for the rest of the LEDs.
-ELEM(CircularSection, "CircularSectionF", Type::INT,
-     Arg("Position", Type::INT),
-     Arg("Fraction", Type::INT)
+FUNC(CircularSectionF, "Circular Section",
+     Arg("Position", INT | FUNCTION),
+     Arg("Fraction", INT | FUNCTION)
      )
 
 // Usage: ClampF<F, MIN, MAX>
@@ -221,16 +236,16 @@ ELEM(CircularSection, "CircularSectionF", Type::INT,
 // F, MIN, MAX: INTEGER
 // MINCLASS, MAXCLASS: FUNCTION
 // return value: INTEGER
-ELEM(Clamp, "ClampF", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Min", Type::RAWINT),
-     Arg("Max", Type::RAWINT)
+FUNC(ClampF, "Clamp",
+     Arg("Input", INT | FUNCTION),
+     Arg("Min", INT),
+     Arg("Max", INT)
      )
 
-ELEM(ClampX, "ClampFX", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Min", Type::INT),
-     Arg("Max", Type::INT)
+FUNC(ClampFX, "Clamp",
+     Arg("Input", INT | FUNCTION),
+     Arg("Min", INT | FUNCTION),
+     Arg("Max", INT | FUNCTION)
      )
 
 // Usage: ClampF<F, MIN, MAX>
@@ -239,14 +254,14 @@ ELEM(ClampX, "ClampFX", Type::INT,
 // F, MIN, MAX: INTEGER
 // MINCLASS, MAXCLASS: FUNCTION
 // return value: INTEGER
-ELEM(ClashImpact, "ClashImpactF", Type::INT,
-     Arg("Min", Type::RAWINT),
-     Arg("Max", Type::RAWINT)
+FUNC(ClashImpactF, "Clash Impact",
+     Arg("Min", INT),
+     Arg("Max", INT)
      )
 
-ELEM(ClashImpactX, "ClashImpactFX", Type::INT,
-     Arg("Min", Type::INT),
-     Arg("Max", Type::INT)
+FUNC(ClashImpactFX, "Clash Impact",
+     Arg("Min", INT | FUNCTION),
+     Arg("Max", INT | FUNCTION)
      )
 
 // Usage: Divide<F, V>
@@ -256,23 +271,23 @@ ELEM(ClashImpactX, "ClashImpactFX", Type::INT,
 // return value: FUNCTION
 // Please note that Divide<> isn't an exact inverse of Mult<> because mult uses fixed-point mathematics
 // (it divides the result by 32768) while Divide<> doesn't, it just returns F / V
-ELEM(Divide, "Divide", Type::INT,
-     Arg("Numerator", Type::INT),
-     Arg("Denominator", Type::INT)
+FUNC(Divide, "Divide",
+     Arg("Numerator", INT | FUNCTION),
+     Arg("Denominator", INT | FUNCTION)
      )
 
 // Usage: EffectPulse<EFFECT>
 // EFFECT: BladeEffectType
 // Returns 32768 once for each time the given effect occurs.
-ELEM(EffectPulse, "EffectPulse", Type::INT,
-     Arg("Trigger", Type::EFFECT)
+FUNC(EffectPulse, "Pulse On Effect",
+     Arg("Trigger Effect", EFFECT)
      )
 
 // Usage: LockupPulseF<LOCKUP_TYPE>
 // LOCKUP_TYPE: a SaberBase::LockupType
 // Returns 32768 once for each time the given lockup occurs.
-ELEM(LockupPulse, "LockupPulseF", Type::INT,
-     Arg("Effect", Type::LOCKUP_TYPE)
+FUNC(LockupPulseF, "Pulse On Lockup",
+     Arg("Trigger Lockup", LOCKUPTYPE)
      )
 
 // Usage: IncrementWithReset<PULSE, RESET_PULSE, MAX, I>
@@ -282,11 +297,11 @@ ELEM(LockupPulse, "LockupPulseF", Type::INT,
 // Starts at zero, increments by I each time the PULSE occurse.
 // If it reaches MAX it stays there.
 // Resets back to zero when RESET_PULSE occurs.
-ELEM(IncrementWithReset, "IncrementWithReset", Type::INT,
-     Arg("Increment Pulse", Type::INT),
-     Arg("Pulse Reset", Type::INT, 0),
-     Arg("Max", Type::INT, 32768),
-     Arg("Increment", Type::INT, 1)
+FUNC(IncrementWithReset, "Increment With Reset",
+     Arg("Increment Pulse", INT | FUNCTION),
+     Arg("Pulse Reset", 	INT | FUNCTION, INT(0)),
+     Arg("Max", 			INT | FUNCTION, INT(32768)),
+     Arg("Increment", 		INT | FUNCTION, INT(1))
      )
 
 // Usage: EffectIncrementF<EFFECT, MAX, I>
@@ -295,10 +310,10 @@ ELEM(IncrementWithReset, "IncrementWithReset", Type::INT,
 // If adding I exceeds MAX, the function returns 0 + any remainder in excesss of MAX
 // I, MAX = numbers
 // return value: INTEGER
-ELEM(EffectIncrement, "EffectIncrementF", Type::INT,
-     Arg("Trigger Effect", Type::EFFECT),
-     Arg("Max", Type::INT, 32768),
-     Arg("Increment", Type::INT, 1)
+FUNC(EffectIncrementF, "Increment On Effect",
+     Arg("Trigger Effect", EFFECT),
+     Arg("Max", INT | FUNCTION, INT(32768)),
+     Arg("Increment", INT | FUNCTION, INT(1))
      )
 
 // Usage: EffectPosition<>
@@ -310,8 +325,8 @@ ELEM(EffectIncrement, "EffectIncrementF", Type::INT,
 // For now, this location is random, but may be set explicitly in the future.
 // When used as EffectPosition<> inside a TransitionEffectL whose EFFECT is already specified,
 // then it will automatically use the right effect.
-ELEM(EffectPosition, "EffectPosition", Type::INT,
-     Arg("Effect", Type::EFFECT, Effect::NONE)
+FUNC(EffectPosition, "Effect Position",
+     Arg("Effect", EFFECT, Effect::NONE)
      )
 
 // Usage: HoldPeakF<F, HOLD_MILLIS, SPEED>
@@ -319,19 +334,19 @@ ELEM(EffectPosition, "EffectPosition", Type::INT,
 // then transitions down over SPEED to current F
 // F, HOLD_MILLIS and SPEED: FUNCTION
 // return value: FUNCTION, same for all LEDs
-ELEM(HoldPeak, "HoldPeakF", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Hold Time (ms)", Type::INT),
-     Arg("Ramp Down Speed", Type::INT)
+FUNC(HoldPeakF, "Hold Peak Value",
+     Arg("Input", INT | FUNCTION),
+     Arg("Hold Time (ms)", INT | FUNCTION),
+     Arg("Ramp Down Speed", INT | FUNCTION)
      )
 
 // Usage: Ifon<A, B>
 // Returns A if saber is on, B otherwise.
 // A, B: INTEGER
 // return value: INTEGER
-ELEM(IfOn, "Ifon", Type::INT,
-     Arg("Value if On", Type::INT),
-     Arg("Value if Off", Type::INT)
+FUNC(Ifon, "If On",
+     Arg("Value if On", INT | FUNCTION),
+     Arg("Value if Off", INT | FUNCTION)
      )
 
 // InOutFunc<OUT_MILLIS, IN_MILLIS>
@@ -339,28 +354,31 @@ ELEM(IfOn, "Ifon", Type::INT,
 // RETURN VALUE: FUNCTION
 // 0 when off, 32768 when on, takes OUT_MILLIS to go from 0 to 32768
 // takes IN_MILLIS to go from 32768 to 0.
-ELEM(InOut, "InOutFunc", Type::INT,
-     Arg("Out Time (ms)", Type::RAWINT),
-     Arg("In Time (ms)", Type::RAWINT)
+// NEED A BETTER HUMAN NAME
+FUNC(InOutFunc, "In Out Func",
+     Arg("Out Time (ms)", INT),
+     Arg("In Time (ms)", INT)
      )
 
-ELEM(InOutX, "InOutFuncX", Type::INT,
-     Arg("Out Time (ms)", Type::INT),
-     Arg("In Time (ms)", Type::INT)
+FUNC(InOutFuncX, "In Out Func",
+     Arg("Out Time (ms)", INT | FUNCTION),
+     Arg("In Time (ms)", INT | FUNCTION)
      )
 
 // Thermal Detonator?
 // NO DOCUMENTATION
-ELEM(InOutTD, "InOutFuncTD", Type::INT,
-     Arg("Out Time (ms)", Type::RAWINT),
-     Arg("In Time (ms)", Type::RAWINT),
-     Arg("Explode Time (ms)", Type::RAWINT)
+// NEED A BETTER HUMAN NAME
+FUNC(InOutFuncTD, "In Out Func TD",
+     Arg("Out Time (ms)", INT),
+     Arg("In Time (ms)", INT),
+     Arg("Explode Time (ms)", INT)
      )
 
 // NO DOCUMENTATION
-ELEM(InOutHelper, "InOutHelperF", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Allow Disable", Type::RAWINT, 1) // Add a bool Type?
+// NEED A BETTER HUMAN NAME
+FUNC(InOutHelperF, "In Out Helper",
+     Arg("Input", INT | FUNCTION),
+     Arg("Allow Disable", BOOL, true) // Add a bool Type?
      )
 
 // Usage: IncrementModulo<PULSE, MAX, INCREMENT>
@@ -369,10 +387,11 @@ ELEM(InOutHelper, "InOutHelperF", Type::INT,
 // INCREMENT: FUNCTION defaults to Int<1>
 // Increments by I each time PULSE occurs wraps around when
 // it reaches MAX.
-ELEM(IncrementModulo, "IncrementModuloF", Type::INT,
-     Arg("Pulse Input", Type::INT),
-     Arg("Max", Type::INT, 32768),
-     Arg("Increment", Type::INT, 1)
+// The documentation is incorrect, the name does end in F
+FUNC(IncrementModuloF, "Increment With Wrap",
+     Arg("Pulse Input", INT | FUNCTION),
+     Arg("Max", INT | FUNCTION, INT(32768)),
+     Arg("Increment", INT | FUNCTION, INT(1))
      )
 
 // Usage: ThresholdPulseF<F, THRESHOLD, HYST_PERCENT>
@@ -382,10 +401,11 @@ ELEM(IncrementModulo, "IncrementModuloF", Type::INT,
 // Returns 32768 once when F > THRESHOLD, then waits until
 // F < THRESHOLD * HYST_PERCENT / 100 before going back
 // to the initial state (waiting for F > THRESHOLD).
-ELEM(ThresholdPulse, "ThresholdPulseF", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Threshold", Type::INT, 32768),
-     Arg("Hysteresis %", Type::INT, 66)
+// BETTER HUMAN NAME?
+FUNC(ThresholdPulseF, "Pulse on Threshold",
+     Arg("Input", INT | FUNCTION),
+     Arg("Threshold", INT | FUNCTION, INT(32768)),
+     Arg("Hysteresis %", INT | FUNCTION, INT(66))
      )
 
 // Usage: IncrementF<F, V, MAX, I, HYST_PERCENT>
@@ -397,20 +417,12 @@ ELEM(ThresholdPulse, "ThresholdPulseF", Type::INT,
 // return value: INTEGER
 // NOTE: this function is designed to separate "events" for use with *Select styles.
 // This function may break up SwingSpeed effects or other continuous responsive functions.
-ELEM(Increment, "IncrementF", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Increment Threshold", Type::INT, 32768),
-     Arg("Max Value", Type::INT, 32768),
-     Arg("Increment", Type::INT, 1),
-     Arg("Hysteresis %", Type::INT, 66)
-     )
-
-// Usage: Int<N>
-// Returns N
-// N: a number
-// return value: INTEGER
-ELEM(Int, "Int", Type::INT,
-     Arg("Number", Type::RAWINT)
+FUNC(IncrementF, "Increment on Input",
+     Arg("Input", INT | FUNCTION),
+     Arg("Increment Threshold", INT | FUNCTION, INT(32768)),
+     Arg("Max Value", INT | FUNCTION, INT(32768)),
+     Arg("Increment", INT | FUNCTION, INT(1)),
+     Arg("Hysteresis %", INT | FUNCTION, INT(66))
      )
 
 // NO DOCUMENTATION
@@ -425,9 +437,11 @@ ELEM(Int, "Int", Type::INT,
 // 	}
 // }
 // So maybe it gets an arg from the list based on the arg num?
-ELEM(IntArg, "IntArg", Type::INT,
-     Arg("Arg", Type::INT),
-     Arg("Default", Type::INT)
+// UPDATE: I'm almost certain this is what it does based on some investigation,
+// RgbArg does the same thing...
+FUNC(IntArg, "Get Int Arg",
+     Arg("Arg", INT | FUNCTION),
+     Arg("Default", INT | FUNCTION)
      )
 
 // Usage: IntSelect<SELECTION, Int1, Int2...>
@@ -436,20 +450,18 @@ ELEM(IntArg, "IntArg", Type::INT,
 // If SELECTION is 0, the first integer is returned, if SELECTIOn is 1, the second and so forth.
 // N: numbers
 // return value: INTEGER
-//
-// I'll need to figure out how to support variadic arguments...
-// ELEM(IntSelect, "IntSelect", Type::INT,
-//      Arg("")
-// )
+FUNC(IntSelect, "Select Based on Value",
+     Arg("Selection #", INT | FUNCTION | VARIADIC)
+)
 
 // Usage: IsBetween<F, BOTTOM, TOP>
 // Returns 0 or 32768 based F > BOTTOM and < TOP
 // F, BOTTOM, TOP: INTEGER
 // return value: INTEGER
-ELEM(IsBetween, "IsBetween", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Bottom", Type::INT),
-     Arg("Top", Type::INT)
+FUNC(IsBetween, "Is Between",
+     Arg("Input", INT | FUNCTION),
+     Arg("Min", INT | FUNCTION),
+     Arg("Max", INT | FUNCTION)
      )
 
 // Usage: IsLessThan<F, V>
@@ -457,14 +469,14 @@ ELEM(IsBetween, "IsBetween", Type::INT,
 // If F < V returns 32768, if F >= V returns 0
 // F, V: INTEGER
 // return value: INTEGER
-ELEM(IsLessThan, "IsLessThan", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Compare", Type::INT)
+FUNC(IsLessThan, "Is Less Than",
+     Arg("Input", INT | FUNCTION),
+     Arg("Compare", INT | FUNCTION)
      )
 
-ELEM(IsGreaterThan, "IsGreaterThan", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Compare", Type::INT)
+FUNC(IsGreaterThan, "Is Greater Than",
+     Arg("Input", INT | FUNCTION),
+     Arg("Compare", INT | FUNCTION)
      )
 
 // Usage: LayerFunctions<F1, F2, ...>
@@ -475,7 +487,7 @@ ELEM(IsGreaterThan, "IsGreaterThan", Type::INT,
 // Basically Mix<LayerFunctions<F1, F2>, A, B> is the same as Mix<F2, Mix<F1, A, B>, B>.
 //
 // This one makes no sense to me... will need to revisit
-// ELEM(LayerFunctions, "LayerFunctions", Type::INT
+// FUNC(LayerFunctions, "LayerFunctions", INT | FUNCTION
 //
 // )
 
@@ -484,9 +496,9 @@ ELEM(IsGreaterThan, "IsGreaterThan", Type::INT,
 // FRACTION: FUNCTION how much of the blade to light up, 0 = none
 // return value: FUNCTION
 // creates a "block" of pixels at POSITION taking up FRACTION of blade
-ELEM(LinearSection, "LinearSectionF", Type::INT,
-     Arg("Position", Type::INT),
-     Arg("Section Size", Type::INT)
+FUNC(LinearSectionF, "Linear Section",
+     Arg("Position", INT | FUNCTION),
+     Arg("Section Size", INT | FUNCTION)
      )
 
 // Usage: MarbleF<OFFSET, FRICTION, ACCELERATION, GRAVITY>
@@ -500,11 +512,11 @@ ELEM(LinearSection, "LinearSectionF", Type::INT,
 // track and returns the position of that marble.
 // Meant to be used with CircularSectionF to turn the marble
 // position into a lighted up section.
-ELEM(Marble, "MarbleF", Type::INT,
-     Arg("Direction Offset", Type::INT),
-     Arg("Friction", Type::INT),
-     Arg("Acceleration", Type::INT),
-     Arg("Gravity", Type::INT)
+FUNC(MarbleF, "Marble Simulation",
+     Arg("Direction Offset", INT | FUNCTION),
+     Arg("Friction", INT | FUNCTION),
+     Arg("Acceleration", INT | FUNCTION),
+     Arg("Gravity", INT | FUNCTION)
      )
 
 // Usage: ModF<F, MAX>
@@ -513,9 +525,9 @@ ELEM(Marble, "MarbleF", Type::INT,
 // When F is greater than MAX, F wraps to 0
 // When F is less than 0, F wraps to MAX
 // returns Integer
-ELEM(Mod, "ModF", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Modder", Type::INT) // Idk whut to call this, I don't like max...
+FUNC(ModF, "Modulo",
+     Arg("Input", INT | FUNCTION),
+     Arg("Divisor", INT | FUNCTION)
      )
 
 // Usage: Mult<F, V>
@@ -526,9 +538,9 @@ ELEM(Mod, "ModF", Type::INT,
 // most blade functions use this method of fixed point calculations
 // F, V: INTEGER,
 // return value: INTEGER
-ELEM(Mult, "Mult", Type::INT,
-     Arg("InputA", Type::INT),
-     Arg("InputB", Type::INT)
+FUNC(Mult, "Multiply",
+     Arg("Input 1", INT | FUNCTION),
+     Arg("Input 2", INT | FUNCTION)
      )
 
 // Usage: Percentage<F, V>
@@ -538,9 +550,9 @@ ELEM(Mult, "Mult", Type::INT,
 // example Percentage<Int<16384>,25>
 // this will give you 25% of Int<16384> and returns Int<4096>
 // return value: INTEGER
-ELEM(Percentage, "Percentage", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Percent", Type::RAWINT)
+FUNC(Percentage, "Percent Of",
+     Arg("Input", INT | FUNCTION),
+     Arg("Percent", INT)
      )
 
 // Usage: OnsparkF<MILLIS>
@@ -550,26 +562,27 @@ ELEM(Percentage, "Percentage", Type::INT,
 // 32768, then fades back to zero over MILLIS milliseconds.
 // This is intended to be used with Mix<> or AlphaL<> to
 // to create a flash of color or white when the blade ignites.
-ELEM(OnSpark, "OnsparkF", Type::INT,
-     Arg("Fade Time (ms)", Type::INT)
+FUNC(OnSparkF, "On Spark",
+     Arg("Fade Time (ms)", INT | FUNCTION)
      )
 
 // Returns led as value between 0 ~ 32768
 // Keeps existing mapping for pixels when used with Remap<>
 // Example: Remap<RampF,COLOR>
-ELEM(Ramp, "RampF", Type::INT)
+// NEED A BETTER HUMAN NAME
+FUNC(RampF, "LED Ramp")
 
 // Usage: RandomF
 // Return value: FUNCTION
 // Returns a random number between 0 and 32768.
 // All LEDS gets the same value.
-ELEM(Random, "RandomF", Type::INT)
+FUNC(RandomF, "Random")
 
 // Usage: RandomPerLEDF
 // Return value: FUNCTION
 // Returns a random number between 0 and 32768.
 // Each LED gets a different random value.
-ELEM(RandomPerLED, "RandomPerLEDF", Type::INT)
+FUNC(RandomPerLEDF, "Random Per LED")
 
 // Usage: EffectRandomF<EFFECT>
 // Returns a random value between 0 and 32768 each time EVENT is triggered
@@ -577,8 +590,8 @@ ELEM(RandomPerLED, "RandomPerLEDF", Type::INT)
 //
 // Except it's each time an EFFECT is triggered, not EVENT.
 // RandomEffect makes more sense for a name to me...
-ELEM(EffectRandom, "EffectRandomF", Type::INT,
-     Arg("Trigger Effect", Type::EFFECT)
+FUNC(EffectRandom, "Random On Effect",
+     Arg("Trigger Effect", EFFECT)
      )
 
 // Usage: RandomBlinkF<MILLIHZ>
@@ -586,18 +599,19 @@ ELEM(EffectRandom, "EffectRandomF", Type::INT,
 // Randomly returns either 0 or 32768 for each LED. The returned value
 // is held, but changed to a new random value MILLIHZ * 1000 times per
 // second.
-ELEM(RandomBlink, "RandomBlinkF", Type::INT,
-     Arg("Time (mHz)", Type::INT)
+// NEED A BETTER HUMAN NAME
+FUNC(RandomBlinkF, "Random Per Time",
+     Arg("Time (mHz)", INT | FUNCTION)
      )
 
 // Usage: Scale<F, A, B>
 // Changes values in range 0 - 32768 to A-B
 // F, A, B: INTEGER
 // return value: INTEGER
-ELEM(Scale, "Scale", Type::INT,
-     Arg("Input", Type::INT),
-     Arg("Min", Type::INT),
-     Arg("Max", Type::INT)
+FUNC(Scale, "Scale",
+     Arg("Input", INT | FUNCTION),
+     Arg("Min", INT | FUNCTION),
+     Arg("Max", INT | FUNCTION)
      )
 
 // To simplify inverting a function's returned value
@@ -605,8 +619,8 @@ ELEM(Scale, "Scale", Type::INT,
 //
 // This actually just uses Scale<F, Int<32768>, Int<0>> under the hood, so
 // is an example I suppose...
-ELEM(Invert, "InvertF", Type::INT,
-     Arg("Input", Type::INT)
+FUNC(InvertF, "Invert",
+     Arg("Input", INT | FUNCTION)
      )
 
 // usage: SequenceF<millis_per_bits, bits, 0b0000000000000000, ....>
@@ -619,11 +633,11 @@ ELEM(Invert, "InvertF", Type::INT,
 // Note that if not all bits are used within the 16-bit number.
 // Example, an SOS pattern:
 // SequenceF<100, 37, 0b0001010100011100, 0b0111000111000101, 0b0100000000000000>
-// ELEM(Sequence, "SequenceF", Type::INT,
-//      Arg("Time Per Bit (ms)", Type::RAWINT),
-//      Arg("Number of Bits", Type::RAWINT)
-//      ... variadics still...
-//      )
+FUNC(SequenceF, "Binary Sequence",
+     Arg("Time Per Bit (ms)", INT),
+     Arg("Number of Bits", INT),
+     Arg("Bit Section #", BITS | VARIADIC)
+)
 
 // Usage: Sin<RPM, LOW, HIGH>
 // pulses between LOW - HIGH RPM times per minute
@@ -631,22 +645,22 @@ ELEM(Invert, "InvertF", Type::INT,
 // HIGH: INTEGER (defaults to Int<32768>)
 // RPM: INTEGER
 // return value: INTEGER
-ELEM(Sin, "Sin", Type::INT,
-     Arg("RPM", Type::INT),
-     Arg("Min", Type::INT, 0),
-     Arg("Max", Type::INT, 32768)
+FUNC(Sin, "Sin",
+     Arg("RPM", INT | FUNCTION),
+     Arg("Min", INT | FUNCTION, INT(0)),
+     Arg("Max", INT | FUNCTION, INT(32768))
      )
 
 // NO DOCUMENTATION
-ELEM(Saw, "Saw", Type::INT,
-     Arg("RPM", Type::INT),
-     Arg("Min", Type::INT, 0),
-     Arg("Max", Type::INT, 32768)
+FUNC(Saw, "Saw",
+     Arg("RPM", INT | FUNCTION),
+     Arg("Min", INT | FUNCTION, INT(0)),
+     Arg("Max", INT | FUNCTION, INT(32768))
      )
 
 // NO DOCUMENTATION
-ELEM(Pulsing, "PulsingF", Type::INT,
-     Arg("Time (ms)", Type::INT)
+FUNC(PulsingF, "Pulsing",
+     Arg("Time (ms)", INT | FUNCTION)
      )
 
 // Left off at slice.h
