@@ -71,7 +71,7 @@ struct Base {
     virtual const std::string_view getName() const = 0;
     virtual const std::string_view getHumanName() const = 0;
     virtual int32_t getType() const = 0;
-    virtual const std::vector<Arg>& getArgs() const = 0;
+    virtual std::vector<Arg>& getArgs() = 0;
 };
 
 #define ELEM(name, humanName, retType, ...) \
@@ -116,7 +116,7 @@ struct name : Base { \
     static const std::string_view getNameStatic() { return #name; } \
     virtual const std::string_view getHumanName() const { return humanName; } \
     virtual int32_t getType() const { return retType; } \
-    virtual const std::vector<Arg>& getArgs() const { return args; } \
+    virtual std::vector<Arg>& getArgs() { return args; } \
 private: \
     virtual const std::string_view getName() const { return getNameStatic(); } \
     std::vector<Arg> args{ \

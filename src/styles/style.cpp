@@ -44,18 +44,16 @@ std::shared_ptr<Style::Base> Style::parseString(const std::string& styleStr) {
     }
 
     auto style{styleGen()};
-    auto styleArgs{style->getArgs()};
-    if (styleArgs.size() < styleTokens->args.size()) {
-        Logger::error("Too many arguments for style element: " + styleTokens->name);
+    auto& styleArgs{style->getArgs()};
+    if (styleArgs.size() < styleTokens->args.size() && (styleArgs.empty() ? true : !(styleArgs.at(styleArgs.size() - 1).type & VARIADIC))) {
+        Logger::error("Too many arguments for: " + styleTokens->name);
         return nullptr;
     }
 
-
-    std::shared_ptr<Style::Base> argElement;
     for (size_t i = 0; i < styleArgs.size(); i++) {
         if (i >= styleTokens->args.size()) {
             if (!styleArgs.at(i).defaultVal) {
-                Logger::error("Not enough arguments for style element: " + styleTokens->name);
+                Logger::error("Not enough arguments for: " + styleTokens->name);
                 return nullptr;
             }
             break;
@@ -65,9 +63,6 @@ std::shared_ptr<Style::Base> Style::parseString(const std::string& styleStr) {
             Logger::warn("Error while parsing style: " + styleTokens->name);
             return nullptr;
         }
-
-        // Now check each type
-        // if (styleTokens->args.at(i).)
     }
 
     return style;
@@ -78,22 +73,18 @@ std::optional<std::string> Style::asString(const std::shared_ptr<Base>) {
 }
 
 static std::optional<TokenizedStyle> tokenizeStyle(const std::string& styleStr) {
-    auto styleBegin{styleStr.find_first_not_of(" \t\n")};
+    auto styleBegin{styleStr.find_first_not_of(" &\t\n")};
     if (styleBegin == std::string::npos) {
         Logger::warn("Could not tokenize style!", false);
         return std::nullopt;
     }
     auto nameEnd{styleStr.find_first_of("<(", styleBegin)};
-    if (nameEnd == std::string::npos) {
-        Logger::warn("Could not tokenize style name!", false);
-        return std::nullopt;
-    }
     auto styleName{styleStr.substr(styleBegin, nameEnd - styleBegin)};
 
     TokenizedStyle styleTokens;
     styleTokens.name = styleName;
 
-    if (styleStr.at(nameEnd) != '<') return styleTokens;
+    if (nameEnd > styleStr.length() || styleStr.at(nameEnd) != '<') return styleTokens;
 
     auto argSubStr{styleStr.substr(nameEnd + 1)};
     std::string buf;
@@ -115,7 +106,7 @@ static std::optional<TokenizedStyle> tokenizeStyle(const std::string& styleStr) 
             }
             if (depth == 0) {
                 styleTokens.args.push_back(buf);
-                continue;
+                break;
             }
         }
 
@@ -137,14 +128,17 @@ static std::optional<TokenizedStyle> tokenizeStyle(const std::string& styleStr) 
 
 static bool parseArg(const std::string& argToken, Style::Arg& arg, size_t argNum) {
     using namespace Style;
-    argNum++; // 0 to 1-based indexing for errors
+    argNum++; // Switch from 0 to 1-based indexing for errors
 
     std::shared_ptr<Style::Base> argObj;
     if (argToken.find('<') != std::string::npos) argObj = Style::parseString(argToken);
     else argObj = nullptr;
 
-    if (arg.type & FUNCTION) {
-        if (!argObj) return false;
+    if (argObj) {
+        if (!(arg.type & FUNCTION) && !(arg.type & COLOR)) {
+            Logger::error("Got unexpected function for argument " + std::to_string(argNum));
+            return false;
+        }
         if (argObj->getType() != arg.type) {
             Logger::error("Mismatched function type at argument " +
                           std::to_string(argNum) +
@@ -159,15 +153,6 @@ static bool parseArg(const std::string& argToken, Style::Arg& arg, size_t argNum
         arg.val = argObj;
         return true;
     }
-
-
-    // BUILTIN		= 0b00000000000010,
-    // INT			= 0b00000000000100,
-    // BITS		= 0b00000000001000,
-    // BOOL		= 0b00000000010000,
-    // COLOR 		= 0b00000000100000,
-    // EFFECT		= 0b00000001000000,
-    // LOCKUPTYPE	= 0b00000010000000,
 
     switch (arg.type & FLAGMASK) {
     case STYLETYPE:
@@ -220,7 +205,7 @@ static bool parseArg(const std::string& argToken, Style::Arg& arg, size_t argNum
 }
 
 static std::string typeToString(int32_t type) {
-    switch (type) {
+    switch (type & Style::FLAGMASK) {
     case Style::STYLETYPE:
         return "Wrapper";
     case Style::BUILTIN:

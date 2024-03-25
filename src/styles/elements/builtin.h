@@ -23,7 +23,7 @@
 
 namespace Style::Builtin {
 
-ELEM(Charging, "&style_charging", Type::BUILTIN)
-ELEM(POV, "&style_pov", Type::BUILTIN)
+ELEM(style_charging, "Charging Style", BUILTIN)
+ELEM(style_pov, "POV Style", BUILTIN)
 
 }

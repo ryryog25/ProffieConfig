@@ -22,7 +22,6 @@
 #include "styles/base.h"
 
 namespace Style::Wrapper {
-
 #define STYLETYPE(name, humanName, ...) ELEM(name, humanName, STYLETYPE, __VA_ARGS__)
 
 // NEED A BETTER HUMAN NAME for all these tbh

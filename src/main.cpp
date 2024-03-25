@@ -44,7 +44,7 @@ public:
         }
 #   	endif
 
-        auto style{Style::parseString("ClampF<Int<50>, 10, 100>")};
+        auto style{Style::parseString("StylePtr<WHITE>()")};
 
         // StyleEdit::generatePage();
 

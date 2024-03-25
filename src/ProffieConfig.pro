@@ -69,6 +69,7 @@ HEADERS += \
         styles/elements/effects.h \
         styles/elements/functions.h \
     styles/elements/lockuptype.h \
+    styles/elements/styles.h \
     styles/elements/styletypes.h \
         styles/generator.h \
         styles/style.h \

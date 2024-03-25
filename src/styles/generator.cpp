@@ -24,6 +24,7 @@
 
 #include "styles/elements/functions.h"
 #include "styles/elements/styletypes.h"
+#include "styles/elements/builtin.h"
 
 std::function<std::shared_ptr<Style::Base>(void)> Style::getGenerator(const std::string_view& styleStr) {
 #   define MAPENTRY(styleName) \
@@ -37,6 +38,8 @@ std::function<std::shared_ptr<Style::Base>(void)> Style::getGenerator(const std:
         MAPENTRY(Wrapper::RainbowPtr),
         MAPENTRY(Wrapper::RainbowPtrX),
         MAPENTRY(Wrapper::StrobePtr),
+        MAPENTRY(Builtin::style_charging),
+        MAPENTRY(Builtin::style_pov),
         MAPENTRY(Function::Int),
         MAPENTRY(Function::AltF),
         MAPENTRY(Function::SyncAltToVarianceF),
