@@ -47,7 +47,7 @@ public:
         auto style{BladeStyles::parseString("StylePtr<AudioFlicker<Blue, WHITE>>()")};
         auto styleStr{BladeStyles::asString(style)};
 
-        // StyleEdit::generatePage();
+        StyleEdit::generatePage();
 
 
         return true;
