@@ -19,13 +19,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <functional>
 #include <memory>
+#include <functional>
+#include <unordered_map>
+#include <vector>
 
-#include "styles/base.h"
+#include "styles/bladestyle.h"
 
-namespace Style {
+namespace BladeStyles::Generator {
 
-std::function<std::shared_ptr<Style::Base>(void)> getGenerator(const std::string_view& styleStr);
+typedef std::function<std::shared_ptr<BladeStyle>(const std::vector<Value>&)> StyleGenerator;
+typedef std::unordered_map<std::string, StyleGenerator> StyleMap;
+
+const StyleGenerator get(const std::string& styleName);
+
+#define GENERATORMAP(name, humanName, type, ...) { \
+    name, \
+    [](const std::vector<Value>& values) -> std::shared_ptr<BladeStyle> { \
+        auto style{std::make_shared<BladeStyle>(name, humanName, type, std::vector<Arg>{ __VA_ARGS__ } )}; \
+        style->setArgs(values); \
+        return style; \
+    } \
+}
 
 }

@@ -42,11 +42,16 @@ SOURCES += \
         log/logger.cpp \
         pconf/pconf.cpp \
         prop/propfile.cpp \
+    styles/bladestyle.cpp \
+    styles/elements/builtin.cpp \
         styles/elements/colors.cpp \
         styles/elements/effects.cpp \
+    styles/elements/functions.cpp \
     styles/elements/lockuptype.cpp \
+    styles/elements/styles.cpp \
+    styles/elements/wrappers.cpp \
         styles/generator.cpp \
-        styles/style.cpp \
+    styles/parse.cpp \
         test/styleedit.cpp \
         ui/combobox.cpp \
         ui/numeric.cpp \
@@ -63,16 +68,16 @@ HEADERS += \
         log/logger.h \
         pconf/pconf.h \
         prop/propfile.h \
-        styles/base.h \
+    styles/bladestyle.h \
     styles/elements/builtin.h \
         styles/elements/colors.h \
         styles/elements/effects.h \
         styles/elements/functions.h \
     styles/elements/lockuptype.h \
     styles/elements/styles.h \
-    styles/elements/styletypes.h \
+    styles/elements/wrappers.h \
         styles/generator.h \
-        styles/style.h \
+    styles/parse.h \
         test/styleedit.h \
         ui/combobox.h \
         ui/numeric.h \

@@ -22,7 +22,7 @@
 #include <optional>
 #include <string>
 
-namespace Style {
+namespace BladeStyles {
 
 #define LOCKUP_TYPES \
     LTMAP(NONE, "NONE") \

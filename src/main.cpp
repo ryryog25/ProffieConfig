@@ -23,7 +23,7 @@
 #include "config/config.h"
 #include "appcore/state.h"
 #include "test/styleedit.h"
-#include "styles/style.h"
+#include "styles/parse.h"
 
 class ProffieConfig : public wxApp {
 public:
@@ -44,7 +44,8 @@ public:
         }
 #   	endif
 
-        auto style{Style::parseString("StylePtr<WHITE>()")};
+        auto style{BladeStyles::parseString("StylePtr<AudioFlicker<Blue, WHITE>>()")};
+        auto styleStr{BladeStyles::asString(style)};
 
         // StyleEdit::generatePage();
 

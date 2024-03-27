@@ -19,11 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "styles/base.h"
+#include "styles/generator.h"
 
-namespace Style::Builtin {
+namespace BladeStyles::Builtin {
 
-ELEM(style_charging, "Charging Style", BUILTIN)
-ELEM(style_pov, "POV Style", BUILTIN)
+const Generator::StyleGenerator get(const std::string& styleName);
+const Generator::StyleMap& getMap();
 
 }

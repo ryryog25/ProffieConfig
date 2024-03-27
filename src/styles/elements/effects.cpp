@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-std::optional<Style::Effect> Style::strToEffect(const std::string& inputStr) {
+std::optional<BladeStyles::Effect> BladeStyles::strToEffect(const std::string& inputStr) {
 #	define EMAP(def, str) if (str == inputStr || str == "EFFECT_" + inputStr) return Effect::def;
 
     ALL_EFFECTS;
@@ -28,7 +28,7 @@ std::optional<Style::Effect> Style::strToEffect(const std::string& inputStr) {
 # 	undef EMAP
 }
 
-std::optional<std::string> Style::effectToStr(Effect effect) {
+std::optional<std::string> BladeStyles::effectToStr(Effect effect) {
 #	define EMAP(def, str) if (Effect::def == effect) return std::string("EFFECT_") + str;
 
     ALL_EFFECTS;
@@ -37,6 +37,6 @@ std::optional<std::string> Style::effectToStr(Effect effect) {
 #	undef EMAP
 }
 
-std::optional<std::string> Style::effectToHumanStr(Effect effect) {
+std::optional<std::string> BladeStyles::effectToHumanStr(Effect effect) {
     return /* toHumanStr( */ effectToStr(effect);
 }

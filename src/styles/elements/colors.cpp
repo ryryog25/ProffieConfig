@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-std::optional<Style::Color> Style::strToColor(const std::string& str) {
+std::optional<BladeStyles::Color> BladeStyles::strToColor(const std::string& str) {
 #	define CMAP(colorStr, ret) if (str == colorStr) return Color::ret;
 
     ALL_COLORS;
@@ -28,7 +28,7 @@ std::optional<Style::Color> Style::strToColor(const std::string& str) {
 #	undef CMAP
 }
 
-std::optional<std::string> Style::colorToStr(Color color) {
+std::optional<std::string> BladeStyles::colorToStr(Color color) {
 #	define CMAP(colorStr, name) if (color == Color::name) return colorStr;
 
     ALL_COLORS;

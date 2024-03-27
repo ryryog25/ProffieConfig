@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-std::optional<Style::LockupType> Style::strToLockupType(const std::string& inputStr) {
+std::optional<BladeStyles::LockupType> BladeStyles::strToLockupType(const std::string& inputStr) {
 #	define LTMAP(def, str) if (inputStr == str || "LOCKUP_" + inputStr == str) return LockupType::def;
 
     LOCKUP_TYPES;
@@ -28,7 +28,7 @@ std::optional<Style::LockupType> Style::strToLockupType(const std::string& input
 #	undef LTMAP
 }
 
-std::optional<std::string> Style::lockupTypeToStr(LockupType lockupType) {
+std::optional<std::string> BladeStyles::lockupTypeToStr(LockupType lockupType) {
 #	define LTMAP(def, str) if (lockupType == LockupType::def) return str;
 
     LOCKUP_TYPES;
@@ -37,6 +37,6 @@ std::optional<std::string> Style::lockupTypeToStr(LockupType lockupType) {
 #	undef LTMAP
 }
 
-std::optional<std::string> Style::lockupTypeToHumanStr(LockupType lockupType) {
+std::optional<std::string> BladeStyles::lockupTypeToHumanStr(LockupType lockupType) {
     return /*defToHumanStr(*/ lockupTypeToStr(lockupType);
 }

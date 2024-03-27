@@ -22,7 +22,7 @@
 #include <string>
 #include <optional>
 
-namespace Style {
+namespace BladeStyles {
 
 #define PRIMARY_COLORS \
     CMAP("RED", RED) \

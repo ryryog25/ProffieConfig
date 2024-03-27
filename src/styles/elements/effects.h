@@ -22,7 +22,7 @@
 #include <string>
 #include <optional>
 
-namespace Style {
+namespace BladeStyles {
 
 #define GENERAL_EFFECTS \
     EMAP(NONE, "NONE") \
